@@ -25,35 +25,48 @@
 /go-openapi
 ├── api
 │   ├── handler
-│   │   ├── auth.go
-│   │   └── user.go
+│   │   ├── auth
+│   │   │   ├── client.go
+│   │   │   └── login.go
+│   │   └── user
+│   │       ├── user.go
+│   │       └── verify.go
 │   ├── middleware
-│   │   ├── auth.go
-│   │   └── logger.go
+│   │   └── auth.go
 │   ├── router
+│   │   ├── base.go
 │   │   └── v1.go
 │   └── server.go
-├── db
-│   ├── migrations
-│   └── models
-├── internal
+├── cmd
 │   ├── auth
-│   ├── logger
-│   ├── server
+│   │   └── token.go
 │   └── user
+│       └── verify.go
+├── configs
+│   ├── cache.go
+│   ├── db.go
+│   └── env.go
+├── model
+│   ├── client
+│   │   └── client.go
+│   └── user
+│       ├── user.go
+│       └── validation.go
 ├── pkg
 │   ├── auth
-│   ├── db
-│   ├── logger
-│   └── user
-├── configs
-│   └── config.go
-├── scripts
-├── docs
-├── Dockerfile
-├── docker-compose.yml
+│   │   ├── client.go
+│   │   └── token.go
+│   ├── notify
+│   │   └── email.go
+│   └── utils
+│       ├── hash.go
+│       ├── password.go
+│       └── string.go
+├── .env
+├── .gitignore
 ├── go.mod
 ├── go.sum
+├── main.go
 └── README.md
 ```
 
