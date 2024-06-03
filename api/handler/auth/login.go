@@ -1,8 +1,9 @@
 package auth
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v3"
-	"go-openapi/cmd/auth"
+	authCmd "go-openapi/cmd/auth"
 	"go-openapi/config"
 	userModel "go-openapi/model/user"
 	"go-openapi/pkg/utils"
@@ -36,7 +37,7 @@ func LoginHandler(c fiber.Ctx) error {
 		})
 	}
 	// 토큰 생성
-	accessToken, refreshToken, err := auth.CreateTokenSet(user.ID)
+	accessToken, refreshToken, err := authCmd.CreateTokenSet(user.ID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
@@ -46,4 +47,11 @@ func LoginHandler(c fiber.Ctx) error {
 		"accessToken":  accessToken,
 		"refreshToken": refreshToken,
 	})
+}
+
+// LogoutHandler 로그아웃 핸들러
+func LogoutHandler(c fiber.Ctx) error {
+	user := c.Locals("user").(uint)
+	fmt.Println(user)
+	return nil
 }

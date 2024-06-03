@@ -58,3 +58,35 @@ func CreateClient(userId uint) (*Client, error) {
 	}
 	return client, nil
 }
+
+// GetClients 클라이언트 조회
+func GetClients(userId uint) (*[]Client, error) {
+	if userId == 0 {
+		return nil, errors.New("invalid user instance")
+	}
+	db := config.GetDB()
+	var clients []Client
+	if err := db.Where("user_id = ?", userId).Find(&clients).Error; err != nil {
+		return nil, err
+	}
+	if len(clients) == 0 {
+		return nil, errors.New("client not found")
+	}
+	return &clients, nil
+}
+
+// DeleteClient 클라이언트 삭제
+func DeleteClient(userId uint, id string) error {
+	if userId == 0 {
+		return errors.New("invalid user instance")
+	}
+	db := config.GetDB()
+	var client Client
+	if err := db.Where("user_id = ?", userId).Where("id = ?", id).First(&client).Error; err != nil {
+		return err
+	}
+	if err := db.Delete(&client).Error; err != nil {
+		return err
+	}
+	return nil
+}

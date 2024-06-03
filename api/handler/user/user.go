@@ -8,15 +8,12 @@ import (
 	"gorm.io/gorm"
 )
 
-// requestBody 사용자 생성 요청
-type requestBody struct {
-	Email    string `form:"email"`
-	Password string `form:"password"`
-}
-
 // CreateUserHandler 사용자 생성 핸들러
 func CreateUserHandler(c fiber.Ctx) error {
-	body := new(requestBody)
+	body := new(struct {
+		Email    string `form:"email"`
+		Password string `form:"password"`
+	})
 	if err := c.Bind().Body(body); err != nil {
 		return err
 	}
