@@ -25,6 +25,11 @@ func SendVerifyCodeHandler(c fiber.Ctx) error {
 			"message": "User not found",
 		})
 	}
+	if user.IsVerified {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "User already verified",
+		})
+	}
 	// 인증 코드 생성
 	if err := authCmd.SendVerifyCode(email); err != nil {
 		return err
