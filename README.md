@@ -21,20 +21,22 @@
 - **데이터베이스**: Sqlite3(Local), MySQL(QA, Prod)
 - **클라우드**: AWS
 
-## 폴더 구조(작성중)
+## 폴더 구조
 ```
 /go-openapi
 ├── api
 │   ├── handler
 │   │   ├── auth
 │   │   │   ├── client.go
-│   │   │   └── login.go
+│   │   │   ├── login.go
+│   │   │   └── token.go
 │   │   └── user
 │   │       ├── password.go
 │   │       ├── user.go
 │   │       └── verify.go
 │   ├── middleware
-│   │   └── auth.go
+│   │   ├── auth.go
+│   │   └── permission.go
 │   ├── router
 │   │   ├── base.go
 │   │   └── v1.go
