@@ -36,16 +36,19 @@ func LoginHandler(c fiber.Ctx) error {
 			"message": "Invalid password",
 		})
 	}
-	// 토큰 생성
-	accessToken, refreshToken, err := authCmd.CreateTokenSet(user.ID)
+	// 토큰 생성(사용자 로그인의 경우 클라이언트 관리만 가능)
+	accessToken, refreshToken, err := authCmd.CreateTokenSet(user.ID, "read:client", "write:client")
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
 		})
 	}
 	return c.JSON(fiber.Map{
-		"accessToken":  accessToken,
-		"refreshToken": refreshToken,
+		"tokenType":             "Bearer",
+		"accessToken":           accessToken,
+		"refreshToken":          refreshToken,
+		"accessTokenExpiresIn":  3600,
+		"refreshTokenExpiresIn": 86400,
 	})
 }
 

@@ -5,8 +5,8 @@ import (
 	"go-openapi/model/client"
 )
 
-// CreateClientKeysHandler 클라이언트 키 생성 핸들러
-func CreateClientKeysHandler(c fiber.Ctx) error {
+// CreateClientHandler 클라이언트 키 생성 핸들러
+func CreateClientHandler(c fiber.Ctx) error {
 	user := c.Locals("user").(uint)
 	instance, err := client.CreateClient(user)
 	if err != nil {
@@ -20,8 +20,8 @@ func CreateClientKeysHandler(c fiber.Ctx) error {
 	})
 }
 
-// GetClientKeysHandler 클라이언트 키 조회 핸들러
-func GetClientKeysHandler(c fiber.Ctx) error {
+// GetClientsHandler 클라이언트 키 조회 핸들러
+func GetClientsHandler(c fiber.Ctx) error {
 	user := c.Locals("user").(uint)
 	clients, err := client.GetClients(user)
 	if err != nil {
@@ -41,8 +41,8 @@ func GetClientKeysHandler(c fiber.Ctx) error {
 	return c.JSON(resp)
 }
 
-// DeleteClientKeysHandler 클라이언트 키 삭제 핸들러
-func DeleteClientKeysHandler(c fiber.Ctx) error {
+// DeleteClientHandler 클라이언트 키 삭제 핸들러
+func DeleteClientHandler(c fiber.Ctx) error {
 	user := c.Locals("user").(uint)
 	id := c.Params("id")
 	err := client.DeleteClient(user, id)

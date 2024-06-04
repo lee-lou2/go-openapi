@@ -75,7 +75,7 @@ func VerifyCodeHandler(c fiber.Ctx) error {
 		})
 	}
 	// 토큰 생성
-	accessToken, refreshToken, err := auth.CreateTokenSet(user.ID)
+	accessToken, refreshToken, err := auth.CreateTokenSet(user.ID, "read:client", "write:client")
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),

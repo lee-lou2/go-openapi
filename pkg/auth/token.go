@@ -6,33 +6,38 @@ import (
 	"go-openapi/config"
 )
 
-// ValidateToken 토큰 유효성 검사
-func ValidateToken(tokenString string) (jwt.MapClaims, error) {
-	if token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+// Token 토큰 구조체
+type Token struct {
+	JTI       string `json:"jti"`
+	TokenType string `json:"token_type"`
+	User      uint   `json:"user"`
+	Scope     string `json:"scope"`
+	Iat       int64  `json:"iat"`
+	Exp       int64  `json:"exp"`
+}
+
+// GetTokenClaims 토큰 클레임
+func GetTokenClaims(tokenString string) (*Token, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(config.GetEnv("JWT_SECRET")), nil
-	}); err != nil {
-		return nil, err
-	} else {
-		if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-			return claims, nil
-		} else {
-			return nil, fmt.Errorf("invalid token")
-		}
-	}
-}
-
-// GetUser 사용자 조회
-func GetUser(token string) (uint, error) {
-	claims, err := ValidateToken(token)
+	})
 	if err != nil {
-		return 0, fmt.Errorf("unauthorized")
+		return nil, err
 	}
-	user, ok := claims["user"]
-	if !ok {
-		return 0, fmt.Errorf("user claim not found")
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return nil, fmt.Errorf("unauthorized")
 	}
-	return uint(user.(float64)), nil
+
+	var t Token
+	t.JTI = claims["jti"].(string)
+	t.TokenType = claims["token_type"].(string)
+	t.User = uint(claims["user"].(float64))
+	t.Scope = claims["scope"].(string)
+	t.Iat = int64(claims["iat"].(float64))
+	t.Exp = int64(claims["exp"].(float64))
+	return &t, nil
 }

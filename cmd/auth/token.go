@@ -2,17 +2,19 @@ package auth
 
 import (
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"go-openapi/config"
+	"strings"
 	"time"
 )
 
 // CreateTokenSet 토큰 셋 생성
-func CreateTokenSet(userId uint) (accessToken, refreshToken string, err error) {
-	accessToken, err = CreateToken("access", userId, 3600)
+func CreateTokenSet(userId uint, scopes ...string) (accessToken, refreshToken string, err error) {
+	accessToken, err = CreateToken("access", userId, 3600, scopes...)
 	if err != nil {
 		return
 	}
-	refreshToken, err = CreateToken("refresh", userId, 86400)
+	refreshToken, err = CreateToken("refresh", userId, 86400, scopes...)
 	if err != nil {
 		return
 	}
@@ -20,10 +22,14 @@ func CreateTokenSet(userId uint) (accessToken, refreshToken string, err error) {
 }
 
 // CreateToken 토큰 생성
-func CreateToken(tokenType string, userId uint, exp int) (string, error) {
+func CreateToken(tokenType string, userId uint, exp int, scopes ...string) (string, error) {
+	scope := strings.Join(scopes, " ")
+	tokenId := uuid.New().String()
 	claims := jwt.MapClaims{
+		"jti":        tokenId,
 		"token_type": tokenType,
 		"user":       userId,
+		"scope":      scope,
 		"iat":        time.Now().Unix(),
 		"exp":        time.Now().Add(time.Second * time.Duration(exp)).Unix(),
 	}

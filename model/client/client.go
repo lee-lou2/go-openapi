@@ -8,21 +8,22 @@ import (
 	"gorm.io/gorm"
 )
 
+func init() {
+	db := config.GetDB()
+	_ = db.AutoMigrate(&Client{})
+}
+
 type Client struct {
 	gorm.Model
 	User         user.User `gorm:"foreignKey:UserID"`
 	UserID       uint      `json:"user_id"`
-	ClientId     string    `json:"client_id"`
-	ClientSecret string    `json:"client_secret"`
+	ClientId     string    `json:"client_id" gorm:"index"`
+	ClientSecret string    `json:"client_secret" gorm:"index"`
+	Scope        string    `json:"scope"`
 }
 
 func (c *Client) TableName() string {
 	return "clients"
-}
-
-func init() {
-	db := config.GetDB()
-	_ = db.AutoMigrate(&Client{})
 }
 
 // CreateClient 클라이언트 생성
@@ -52,6 +53,7 @@ func CreateClient(userId uint) (*Client, error) {
 		UserID:       userId,
 		ClientId:     clientId,
 		ClientSecret: clientSecret,
+		Scope:        "read:client write:client read:token read:default",
 	}
 	if err := db.Create(client).Error; err != nil {
 		return nil, err

@@ -26,15 +26,18 @@ func V1Router(app fiber.Router) {
 		auth := v1.Group("/auth")
 		{
 			// Client 생성
-			auth.Post("/client", authHandler.CreateClientKeysHandler, middleware.AuthMiddleware)
+			auth.Post("/client", authHandler.CreateClientHandler, middleware.AuthMiddleware, middleware.PermissionMiddleware("write:client"))
 			// Client 조회
-			auth.Get("/client", authHandler.GetClientKeysHandler, middleware.AuthMiddleware)
+			auth.Get("/client", authHandler.GetClientsHandler, middleware.AuthMiddleware, middleware.PermissionMiddleware("read:client"))
 			// Client 삭제
-			auth.Delete("/client/:id", authHandler.DeleteClientKeysHandler, middleware.AuthMiddleware)
+			auth.Delete("/client/:id", authHandler.DeleteClientHandler, middleware.AuthMiddleware, middleware.PermissionMiddleware("write:client"))
 			// 로그인
 			auth.Post("/login", authHandler.LoginHandler)
 			// 로그아웃
 			auth.Post("/logout", authHandler.LogoutHandler, middleware.AuthMiddleware)
+
+			// 토큰 발급
+			auth.Post("/token", authHandler.CreateTokenHandler)
 		}
 	}
 }

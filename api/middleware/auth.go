@@ -3,9 +3,10 @@ package middleware
 import (
 	"github.com/gofiber/fiber/v3"
 	authPkg "go-openapi/pkg/auth"
+	"strings"
 )
 
-// AuthMiddleware 인증 미들웨어
+// AuthMiddleware 사용자 인증 미들웨어
 func AuthMiddleware(c fiber.Ctx) error {
 	token := c.Get("Authorization")
 	if token == "" {
@@ -16,12 +17,15 @@ func AuthMiddleware(c fiber.Ctx) error {
 	if len(token) > 7 && token[:7] == "Bearer " {
 		token = token[7:]
 	}
-	user, err := authPkg.GetUser(token)
+	// 토큰에서 데이터 조회
+	claims, err := authPkg.GetTokenClaims(token)
 	if err != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"error": "Unauthorized",
 		})
 	}
-	c.Locals("user", user)
+	scopes := strings.Split(claims.Scope, " ")
+	c.Locals("user", claims.User)
+	c.Locals("scopes", scopes)
 	return c.Next()
 }
