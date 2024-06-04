@@ -36,7 +36,7 @@ func CreateUserHandler(c fiber.Ctx) error {
 			return err
 		}
 		// 인증 코드 전송
-		if err := authCmd.SendVerifyCode(user.Email); err != nil {
+		if err := authCmd.SendVerifyCode(user.Email, 1); err != nil {
 			return err
 		}
 		return nil

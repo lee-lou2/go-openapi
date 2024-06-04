@@ -18,6 +18,10 @@ func V1Router(app fiber.Router) {
 			user.Post("/verify", userHandler.SendVerifyCodeHandler)
 			// 이메일 검증
 			user.Patch("/verify/:code", userHandler.VerifyCodeHandler)
+			// 비밀번호 재설정 코드 전송
+			user.Post("/password", userHandler.SendPasswordResetCodeHandler)
+			// 비밀번호 재설정
+			user.Patch("/password/:code", userHandler.ResetPasswordHandler)
 		}
 		auth := v1.Group("/auth")
 		{

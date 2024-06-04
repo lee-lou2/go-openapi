@@ -31,7 +31,7 @@ func SendVerifyCodeHandler(c fiber.Ctx) error {
 		})
 	}
 	// 인증 코드 생성
-	if err := authCmd.SendVerifyCode(body.Email); err != nil {
+	if err := authCmd.SendVerifyCode(body.Email, 1); err != nil {
 		return err
 	}
 	return c.JSON(fiber.Map{"message": "Code sent"})
@@ -55,7 +55,7 @@ func VerifyCodeHandler(c fiber.Ctx) error {
 		return err
 	}
 	// 코드 검증
-	if !userCmd.VerifyCode(body.Email, param.Code) {
+	if !userCmd.VerifyCode(body.Email, param.Code, 1) {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 			"message": "Invalid code",
 		})
