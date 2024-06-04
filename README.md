@@ -4,6 +4,7 @@
 이 프로젝트는 Golang을 이용하여 Open API를 개발하는 개인 프로젝트입니다. 아래와 같은 과제를 수행하면서 기술적인 도전과 문제 해결을 목표로 하고 있습니다.
 
 ## 과제
+- **사용자**: 사용자 생성 및 관련 기능
 - **인증**: OAuth2.0 기반으로 개발자 등록(Authorization Code), API(Client Credentials) 구현
 - **권한 및 제한**: scopes를 통한 권한 부여 및 분당 Call Count 관리(등급제 운영)
 - **개발자 페이지**: Client Key 발급 및 사용량 확인을 위한 페이지 제공
@@ -29,6 +30,7 @@
 │   │   │   ├── client.go
 │   │   │   └── login.go
 │   │   └── user
+│   │       ├── password.go
 │   │       ├── user.go
 │   │       └── verify.go
 │   ├── middleware
@@ -39,7 +41,8 @@
 │   └── server.go
 ├── cmd
 │   ├── auth
-│   │   └── token.go
+│   │   ├── token.go
+│   │   └── token_test.go
 │   └── user
 │       └── verify.go
 ├── configs
@@ -50,6 +53,7 @@
 │   ├── client
 │   │   └── client.go
 │   └── user
+│       ├── password.go
 │       ├── user.go
 │       └── validation.go
 ├── pkg
@@ -60,8 +64,11 @@
 │   │   └── email.go
 │   └── utils
 │       ├── hash.go
+│       ├── hash_test.go
 │       ├── password.go
-│       └── string.go
+│       ├── password_test.go
+│       ├── string.go
+│       └── string_test.go
 ├── .env
 ├── .gitignore
 ├── go.mod
@@ -88,12 +95,19 @@
    go mod tidy
    ```
 
-3. Docker 컨테이너 실행
-   ```sh
-   docker-compose up --build
-   ```
-
-4. 개발 서버 실행
+3. 개발 서버 실행
    ```sh
    go run main.go
    ```
+
+### 환경 변수
+- 로컬 실행 시 `.env` 파일 필요
+```sh
+SERVER_PORT=
+EMAIL_SMTP_HOST=
+EMAIL_SMTP_PORT=
+EMAIL_USERNAME=
+EMAIL_PASSWORD=
+JWT_SECRET=
+COOKIE_ENCRYPT_KEY=
+```
