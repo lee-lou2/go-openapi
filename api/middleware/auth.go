@@ -25,7 +25,7 @@ func AuthMiddleware(c fiber.Ctx) error {
 		})
 	}
 	scopes := strings.Split(claims.Scope, " ")
-	c.Locals("user", claims.User)
-	c.Locals("scopes", scopes)
+	fiber.Locals[uint](c, "user", claims.User)
+	fiber.Locals[[]string](c, "scopes", scopes)
 	return c.Next()
 }

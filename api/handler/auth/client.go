@@ -7,7 +7,7 @@ import (
 
 // CreateClientHandler 클라이언트 키 생성 핸들러
 func CreateClientHandler(c fiber.Ctx) error {
-	user := c.Locals("user").(uint)
+	user := fiber.Locals[uint](c, "user")
 	instance, err := client.CreateClient(user)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -22,7 +22,7 @@ func CreateClientHandler(c fiber.Ctx) error {
 
 // GetClientsHandler 클라이언트 키 조회 핸들러
 func GetClientsHandler(c fiber.Ctx) error {
-	user := c.Locals("user").(uint)
+	user := fiber.Locals[uint](c, "user")
 	clients, err := client.GetClients(user)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
@@ -43,8 +43,8 @@ func GetClientsHandler(c fiber.Ctx) error {
 
 // DeleteClientHandler 클라이언트 키 삭제 핸들러
 func DeleteClientHandler(c fiber.Ctx) error {
-	user := c.Locals("user").(uint)
-	id := c.Params("id")
+	user := fiber.Locals[uint](c, "user")
+	id := fiber.Params[string](c, "id")
 	err := client.DeleteClient(user, id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

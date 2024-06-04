@@ -54,7 +54,7 @@ func LoginHandler(c fiber.Ctx) error {
 
 // LogoutHandler 로그아웃 핸들러
 func LogoutHandler(c fiber.Ctx) error {
-	user := c.Locals("user").(uint)
+	user := fiber.Locals[uint](c, "user")
 	fmt.Println(user)
 	return nil
 }
