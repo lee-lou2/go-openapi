@@ -34,7 +34,10 @@ func SendVerifyCode(email string, codeType int) error {
 	encoded = strings.TrimRight(encoded, "=")
 	host := config.GetEnv("SERVER_HOST")
 	port := config.GetEnv("SERVER_PORT")
-	if err := notify.SendEmail(email, subject, fmt.Sprintf("%s:%s/verify/%d?code=%s", host, port, codeType, encoded)); err != nil {
+	if !(port == "" || port == "80" || port == "443") {
+		host = host + ":" + port
+	}
+	if err := notify.SendEmail(email, subject, fmt.Sprintf("%s/verify/%d?code=%s", host, codeType, encoded)); err != nil {
 		return err
 	}
 	return nil

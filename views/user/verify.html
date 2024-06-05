@@ -32,7 +32,7 @@
         })
             .then(response => {
                 if (response.ok) {
-                    window.location.href = '/';
+                    window.location.href = '/accounts/login';
                 } else {
                     return response.text().then(errorMessage => {
                         window.location.href = '/error?m=' + encodeURIComponent(errorMessage);
