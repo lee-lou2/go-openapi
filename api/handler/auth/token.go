@@ -101,6 +101,7 @@ func CreateTokenHandler(c fiber.Ctx) error {
 	})
 }
 
+// RefreshTokenHandler 토큰 갱신 핸들러
 func RefreshTokenHandler(c fiber.Ctx) error {
 	body := struct {
 		GrantType    string `json:"grant_type"`
