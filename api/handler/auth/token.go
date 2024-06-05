@@ -7,11 +7,12 @@ import (
 	authCmd "go-openapi/cmd/auth"
 	"go-openapi/config"
 	clientModel "go-openapi/model/client"
+	authPkg "go-openapi/pkg/auth"
 	"strings"
 )
 
-// getClientKeys 클라이언트 키 가져오기
-func getClientKeys(c fiber.Ctx) (string, string, error) {
+// getClient 클라이언트 키 가져오기
+func getClient(c fiber.Ctx) (string, string, error) {
 	authHeader := c.Get("Authorization")
 	if authHeader == "" {
 		return "", "", fmt.Errorf("authorization header is required")
@@ -52,7 +53,7 @@ func CreateTokenHandler(c fiber.Ctx) error {
 		})
 	}
 	// 클라이언트 유효성 검사
-	clientId, clientSecret, err := getClientKeys(c)
+	clientId, clientSecret, err := getClient(c)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"error": err.Error(),
@@ -86,7 +87,7 @@ func CreateTokenHandler(c fiber.Ctx) error {
 	}
 	// 토큰 생성(15분)
 	exp := 60 * 15
-	token, err := authCmd.CreateToken("access", client.ID, exp, scopes...)
+	token, err := authCmd.CreateToken("access", client.ID, "client", exp, scopes...)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": err.Error(),
@@ -97,5 +98,46 @@ func CreateTokenHandler(c fiber.Ctx) error {
 		"accessToken": token,
 		"expiresIn":   exp,
 		"scope":       body.Scope,
+	})
+}
+
+// RefreshTokenHandler 토큰 갱신 핸들러
+func RefreshTokenHandler(c fiber.Ctx) error {
+	body := struct {
+		GrantType    string `json:"grant_type"`
+		RefreshToken string `json:"refresh_token"`
+	}{}
+	if err := c.Bind().JSON(&body); err != nil {
+		return err
+	}
+	if body.GrantType == "" || body.RefreshToken == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "invalid_request",
+		})
+	}
+	if body.GrantType != "refresh_token" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"error": "unsupported_grant_type",
+		})
+	}
+	claims, err := authPkg.GetTokenClaims(body.RefreshToken)
+	if err != nil || claims.TokenType != "refresh" {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"error": "Unauthorized",
+		})
+	}
+	// 토큰 생성(15분)
+	exp := 60 * 15
+	token, err := authCmd.CreateToken("access", claims.Sub, "user", exp, "read:client", "write:client")
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+	return c.JSON(fiber.Map{
+		"tokenType":   "Bearer",
+		"accessToken": token,
+		"expiresIn":   exp,
+		"scope":       "read:client write:client",
 	})
 }

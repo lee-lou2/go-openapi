@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Page</title>
+</head>
+<body>
+<script>
+    // URL 쿼리 파라미터에서 'code' 값을 가져옵니다.
+    const urlParams = new URLSearchParams(window.location.search);
+    const encodedCode = urlParams.get('code');
+
+    if (!encodedCode) {
+        window.location.href = '/error?m=' + encodeURIComponent('No code provided in query string');
+    } else {
+        let decodedString = encodedCode.replace(/-/g, '+').replace(/_/g, '/');
+        while (decodedString.length % 4) {
+            decodedString += '=';
+        }
+        const decoded = atob(decodedString);
+        const parts = decoded.split(':');
+        const email = parts[0];
+        const code = parts[1];
+
+        fetch(`/v1/user/verify/${code}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: email })
+        })
+            .then(response => {
+                if (response.ok) {
+                    window.location.href = '/';
+                } else {
+                    return response.text().then(errorMessage => {
+                        window.location.href = '/error?m=' + encodeURIComponent(errorMessage);
+                    });
+                }
+            })
+            .catch(error => {
+                window.location.href = '/error?m=' + encodeURIComponent(error.message);
+            });
+    }
+</script>
+</body>
+</html>

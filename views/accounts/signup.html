@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+        .signup-container {
+            width: 100%;
+            max-width: 400px;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .input-field, .signup-button, .back-button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        .signup-button, .back-button {
+            background-color: transparent;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .signup-button:hover, .back-button:hover {
+            border-color: #252525;
+        }
+    </style>
+</head>
+<body>
+<div class="signup-container">
+    <form id="signup-form" action="/v1/user" method="POST" onsubmit="return validateForm()">
+        <input type="email" name="email" id="email" class="input-field" placeholder="이메일" required>
+        <input type="password" name="password" id="password" class="input-field" placeholder="비밀번호" required>
+        <input type="password" name="confirm_password" id="confirm_password" class="input-field" placeholder="비밀번호 확인" required>
+        <button type="submit" class="signup-button">회원가입</button>
+    </form>
+    <button class="back-button" onclick="history.back()">뒤로가기</button>
+</div>
+<script>
+    function validateForm() {
+        var email = document.getElementById('email').value;
+        var password = document.getElementById('password').value;
+        var confirmPassword = document.getElementById('confirm_password').value;
+
+        var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        var passwordPattern = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
+
+        if (!emailPattern.test(email)) {
+            alert('유효한 이메일 주소를 입력해주세요.');
+            return false;
+        }
+
+        if (!passwordPattern.test(password)) {
+            alert('비밀번호는 6자 이상이어야 하며, 영문자와 숫자를 모두 포함해야 합니다.');
+            return false;
+        }
+
+        if (password !== confirmPassword) {
+            alert('비밀번호가 일치하지 않습니다.');
+            return false;
+        }
+
+        return true;
+    }
+
+    document.getElementById('signup-form').onsubmit = function(e) {
+        e.preventDefault();
+
+        if (validateForm()) {
+            var emailField = document.getElementById('email');
+            var passwordField = document.getElementById('password');
+            var confirmPasswordField = document.getElementById('confirm_password');
+            var signupButton = document.querySelector('.signup-button');
+
+            // Disable inputs and button
+            emailField.disabled = true;
+            passwordField.disabled = true;
+            confirmPasswordField.disabled = true;
+            signupButton.disabled = true;
+
+            var data = new URLSearchParams();
+            data.append('email', emailField.value);
+            data.append('password', passwordField.value);
+
+            fetch('/v1/user', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: data
+            })
+                .then(response => {
+                    if (response.status === 200) {
+                        return response.json();
+                    } else {
+                        throw new Error('회원가입에 실패했습니다.');
+                    }
+                })
+                .then(data => {
+                    alert("회원가입이 완료되었습니다.");
+                    window.location.href = "/";
+                })
+                .catch(error => {
+                    alert(error.message);
+                    // Re-enable inputs and button
+                    emailField.disabled = false;
+                    passwordField.disabled = false;
+                    confirmPasswordField.disabled = false;
+                    signupButton.disabled = false;
+                });
+        }
+    };
+</script>
+</body>
+</html>

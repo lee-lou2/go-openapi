@@ -2,7 +2,6 @@ package user
 
 import (
 	"github.com/gofiber/fiber/v3"
-	"go-openapi/cmd/auth"
 	authCmd "go-openapi/cmd/user"
 	userCmd "go-openapi/cmd/user"
 	"go-openapi/config"
@@ -74,15 +73,5 @@ func VerifyCodeHandler(c fiber.Ctx) error {
 			"message": err.Error(),
 		})
 	}
-	// 토큰 생성
-	accessToken, refreshToken, err := auth.CreateTokenSet(user.ID, "read:client", "write:client")
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": err.Error(),
-		})
-	}
-	return c.JSON(fiber.Map{
-		"accessToken":  accessToken,
-		"refreshToken": refreshToken,
-	})
+	return c.JSON(fiber.Map{"message": "User verified"})
 }

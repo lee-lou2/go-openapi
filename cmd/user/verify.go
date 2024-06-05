@@ -1,10 +1,13 @@
 package user
 
 import (
+	"encoding/base64"
+	"fmt"
 	"go-openapi/config"
 	"go-openapi/pkg/notify"
 	"go-openapi/pkg/utils"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -25,7 +28,13 @@ func SendVerifyCode(email string, codeType int) error {
 	case 2:
 		subject = "비밀번호 재설정 코드"
 	}
-	if err := notify.SendEmail(email, subject, code); err != nil {
+	// 이메일 주소와 코드를 결합하여 인코딩
+	combined := email + ":" + code
+	encoded := base64.URLEncoding.EncodeToString([]byte(combined))
+	encoded = strings.TrimRight(encoded, "=")
+	host := config.GetEnv("SERVER_HOST")
+	port := config.GetEnv("SERVER_PORT")
+	if err := notify.SendEmail(email, subject, fmt.Sprintf("%s:%s/verify/%d?code=%s", host, port, codeType, encoded)); err != nil {
 		return err
 	}
 	return nil

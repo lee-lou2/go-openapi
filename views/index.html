@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>클라이언트 관리</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #ffffff;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #ffffff;
+        }
+        .client-container {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            position: relative;
+            background-color: #ffffff;
+        }
+        .client-input {
+            width: calc(100% - 30px);
+            padding: 5px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .client-input[disabled] {
+            background-color: #e9e9e9;
+        }
+        .small-text {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .delete-button {
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            color: red;
+            font-size: 12px;
+            position: absolute;
+            right: 10px;
+            bottom: 10px;
+        }
+        .create-button, .login-button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            background-color: transparent;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .create-button:hover, .login-button:hover {
+            border-color: #252525;
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="client-list">
+    <button class="create-button" onclick="createClient()">클라이언트 생성</button>
+</div>
+<script>
+    function fetchClients() {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            alert('로그인이 필요합니다.');
+            window.location.href = '/accounts/login/'; // 로그인 페이지로 리디렉션
+            return;
+        }
+
+        fetch('/v1/auth/client/', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+            .then(response => {
+                if (response.status === 401) {
+                    return refreshToken().then(fetchClients);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const clientList = document.getElementById('client-list');
+                clientList.innerHTML = '<button class="create-button" onclick="createClient()">클라이언트 생성</button>';
+                if (!data) {
+                    return;
+                }
+                if (data.length > 0) {
+                    data.forEach(client => {
+                        const clientDiv = document.createElement('div');
+                        clientDiv.className = 'client-container';
+                        clientDiv.innerHTML = `
+                        <input type="text" class="client-input" value="${client.clientId}" disabled>
+                        <input type="text" class="client-input" value="${client.clientSecret}" disabled>
+                        <div class="small-text">${new Date(client.createdAt).toLocaleDateString()}</div>
+                        <button class="delete-button" onclick="deleteClient('${client.id}')">삭제</button>
+                    `;
+                        clientList.appendChild(clientDiv);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (error.message !== 'Unauthorized') {
+                    alert('클라이언트 정보를 불러오는데 실패했습니다.');
+                }
+            });
+    }
+
+    function createClient() {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            alert('로그인이 필요합니다.');
+            window.location.href = '/accounts/login/'; // 로그인 페이지로 리디렉션
+            return;
+        }
+
+        fetch('/v1/auth/client/', {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer ' + token,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({})
+        })
+            .then(response => {
+                if (response.status === 401) {
+                    return refreshToken().then(createClient);
+                }
+                return response.json();
+            })
+            .then(data => {
+                fetchClients(); // 새로운 클라이언트 목록을 다시 불러옴
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (error.message !== 'Unauthorized') {
+                    alert('클라이언트 생성에 실패했습니다.');
+                }
+            });
+    }
+
+    function deleteClient(clientId) {
+        if (!confirm('정말 이 클라이언트를 삭제하시겠습니까?')) {
+            return;
+        }
+
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+            alert('로그인이 필요합니다.');
+            window.location.href = '/accounts/login/';
+            return;
+        }
+
+        fetch(`/v1/auth/client/${clientId}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer ' + token
+            }
+        })
+            .then(response => {
+                if (response.status === 401) {
+                    return refreshToken().then(() => deleteClient(clientId));
+                }
+                if (response.ok) {
+                    fetchClients();
+                } else {
+                    throw new Error('클라이언트 삭제에 실패했습니다.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                if (error.message !== 'Unauthorized') {
+                    alert('클라이언트 삭제에 실패했습니다.');
+                }
+            });
+    }
+
+    function refreshToken() {
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (!refreshToken) {
+            window.location.href = '/accounts/login/';
+            return Promise.reject(new Error('No refresh token available'));
+        }
+
+        return fetch('/v1/auth/token/refresh', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 'refresh_token': refreshToken, 'grant_type': 'refresh_token'})
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Token refresh failed');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.accessToken) {
+                    localStorage.setItem('access_token', data.accessToken);
+                } else {
+                    throw new Error('Token refresh failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                window.location.href = '/accounts/login/';
+            });
+    }
+
+    // 페이지 로드 시 클라이언트 목록 불러오기
+    document.addEventListener('DOMContentLoaded', fetchClients);
+</script>
+</body>
+</html>

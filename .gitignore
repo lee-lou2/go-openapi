@@ -1,3 +1,4 @@
 .idea
 .env
 sqlite.db
+deploy.sh

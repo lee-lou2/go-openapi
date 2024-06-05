@@ -24,16 +24,8 @@ func SendPasswordResetCodeHandler(c fiber.Ctx) error {
 
 // ResetPasswordHandler 비밀번호 재설정 핸들러
 func ResetPasswordHandler(c fiber.Ctx) error {
-	param := struct {
-		Code string `uri:"code"`
-	}{}
-	err := c.Bind().URI(&param)
-	if err != nil || param.Code == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid request",
-		})
-	}
 	body := new(struct {
+		Code     string `uri:"code"`
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	})
@@ -45,7 +37,7 @@ func ResetPasswordHandler(c fiber.Ctx) error {
 			"message": "Invalid request",
 		})
 	}
-	if userCmd.VerifyCode(body.Email, param.Code, 2) {
+	if !userCmd.VerifyCode(body.Email, body.Code, 2) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid code",
 		})
