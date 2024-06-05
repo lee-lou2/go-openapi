@@ -1,6 +1,7 @@
 package api
 
 import (
+	"github.com/goccy/go-json"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/encryptcookie"
@@ -9,13 +10,19 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/pprof"
 	"github.com/gofiber/fiber/v3/middleware/recover"
 	"github.com/gofiber/fiber/v3/middleware/requestid"
+	"github.com/gofiber/template/html/v2"
 	"go-openapi/api/router"
 	"go-openapi/config"
 )
 
 func Server() error {
 	// Fiber 인스턴스 생성
-	app := fiber.New()
+	engine := html.New("./views", ".html")
+	app := fiber.New(fiber.Config{
+		JSONEncoder: json.Marshal,
+		JSONDecoder: json.Unmarshal,
+		Views:       engine,
+	})
 
 	// 미들웨어 설정
 	app.Use(requestid.New())
@@ -43,6 +50,7 @@ func Server() error {
 
 	// 라우터 설정
 	router.BaseRouter(app)
+	router.TemplateRouter(app)
 	router.V1Router(app)
 
 	// 미들웨어

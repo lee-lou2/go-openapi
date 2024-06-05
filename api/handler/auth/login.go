@@ -14,12 +14,8 @@ func LoginHandler(c fiber.Ctx) error {
 	email := c.FormValue("email")
 	password := c.FormValue("password")
 	if ok, err := userModel.ValidateUser(email, password); !ok || err != nil {
-		errMsg := "Invalid request"
-		if err != nil {
-			errMsg = err.Error()
-		}
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"message": errMsg,
+			"message": "failed login",
 		})
 	}
 	// 사용자 조회
@@ -27,20 +23,20 @@ func LoginHandler(c fiber.Ctx) error {
 	user := userModel.User{}
 	if err := db.Where("email = ?", email).Where("is_verified = true").First(&user).Error; err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"message": "User not found",
+			"message": "failed login",
 		})
 	}
 	// 비밀번호 확인
 	if !utils.CheckPasswordHash(password, user.Password) {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"message": "Invalid password",
+			"message": "failed login",
 		})
 	}
 	// 토큰 생성(사용자 로그인의 경우 클라이언트 관리만 가능)
-	accessToken, refreshToken, err := authCmd.CreateTokenSet(user.ID, "read:client", "write:client")
+	accessToken, refreshToken, err := authCmd.CreateTokenSet(user.ID, "user", "read:client", "write:client")
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": err.Error(),
+			"message": "failed login",
 		})
 	}
 	return c.JSON(fiber.Map{

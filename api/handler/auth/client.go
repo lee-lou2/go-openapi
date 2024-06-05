@@ -25,9 +25,7 @@ func GetClientsHandler(c fiber.Ctx) error {
 	user := fiber.Locals[uint](c, "user")
 	clients, err := client.GetClients(user)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": err.Error(),
-		})
+		return err
 	}
 	resp := make([]fiber.Map, 0)
 	for _, instance := range *clients {

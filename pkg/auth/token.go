@@ -10,7 +10,8 @@ import (
 type Token struct {
 	JTI       string `json:"jti"`
 	TokenType string `json:"token_type"`
-	User      uint   `json:"user"`
+	Sub       uint   `json:"sub"`
+	SubType   string `json:"sub_type"`
 	Scope     string `json:"scope"`
 	Iat       int64  `json:"iat"`
 	Exp       int64  `json:"exp"`
@@ -35,7 +36,8 @@ func GetTokenClaims(tokenString string) (*Token, error) {
 	var t Token
 	t.JTI = claims["jti"].(string)
 	t.TokenType = claims["token_type"].(string)
-	t.User = uint(claims["user"].(float64))
+	t.Sub = uint(claims["sub"].(float64))
+	t.SubType = claims["sub_type"].(string)
 	t.Scope = claims["scope"].(string)
 	t.Iat = int64(claims["iat"].(float64))
 	t.Exp = int64(claims["exp"].(float64))

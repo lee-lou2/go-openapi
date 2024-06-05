@@ -17,7 +17,7 @@ func init() {
 func TestCreateTokenSet(t *testing.T) {
 	userId := uint(1)
 
-	accessToken, refreshToken, err := CreateTokenSet(userId)
+	accessToken, refreshToken, err := CreateTokenSet(userId, "user")
 	assert.NoError(t, err)           // 오류가 없는지 확인
 	assert.NotEmpty(t, accessToken)  // 액세스 토큰이 비어있지 않은지 확인
 	assert.NotEmpty(t, refreshToken) // 리프레시 토큰이 비어있지 않은지 확인
@@ -28,8 +28,9 @@ func TestCreateTokenSet(t *testing.T) {
 		return []byte(config.GetEnv("JWT_SECRET")), nil
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, "access", accessClaims["token_type"])  // 토큰 타입이 "access"인지 확인
-	assert.Equal(t, float64(userId), accessClaims["user"]) // 사용자 ID가 일치하는지 확인
+	assert.Equal(t, "access", accessClaims["token_type"]) // 토큰 타입이 "access"인지 확인
+	assert.Equal(t, float64(userId), accessClaims["sub"]) // 사용자 ID가 일치하는지 확인
+	assert.Equal(t, "user", accessClaims["sub_type"])     // 사용자 ID가 일치하는지 확인
 
 	// 리프레시 토큰 검증
 	refreshClaims := jwt.MapClaims{}
@@ -38,7 +39,8 @@ func TestCreateTokenSet(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, "refresh", refreshClaims["token_type"]) // 토큰 타입이 "refresh"인지 확인
-	assert.Equal(t, float64(userId), refreshClaims["user"]) // 사용자 ID가 일치하는지 확인
+	assert.Equal(t, float64(userId), refreshClaims["sub"])  // 사용자 ID가 일치하는지 확인
+	assert.Equal(t, "user", refreshClaims["sub_type"])      // 사용자 ID가 일치하는지 확인
 }
 
 // TestCreateToken 은 CreateToken 함수의 동작을 다양한 케이스로 테스트합니다.
@@ -55,7 +57,7 @@ func TestCreateToken(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.tokenType, func(t *testing.T) {
-			token, err := CreateToken(tt.tokenType, tt.userId, tt.exp)
+			token, err := CreateToken(tt.tokenType, tt.userId, "user", tt.exp)
 			assert.NoError(t, err)    // 오류가 없는지 확인
 			assert.NotEmpty(t, token) // 토큰이 비어있지 않은지 확인
 
@@ -65,7 +67,8 @@ func TestCreateToken(t *testing.T) {
 			})
 			assert.NoError(t, err)
 			assert.Equal(t, tt.tokenType, claims["token_type"])                                                                                    // 토큰 타입이 일치하는지 확인
-			assert.Equal(t, float64(tt.userId), claims["user"])                                                                                    // 사용자 ID가 일치하는지 확인
+			assert.Equal(t, float64(tt.userId), claims["sub"])                                                                                     // 사용자 ID가 일치하는지 확인
+			assert.Equal(t, "user", claims["sub_type"])                                                                                            // 사용자 ID가 일치하는지 확인
 			assert.WithinDuration(t, time.Now().Add(time.Second*time.Duration(tt.exp)), time.Unix(int64(claims["exp"].(float64)), 0), time.Second) // 만료 시간이 정확한지 확인
 		})
 	}
@@ -82,7 +85,7 @@ func TestCreateToken_InvalidSecret(t *testing.T) {
 	config.SetEnv("JWT_SECRET", "invalid_secret")
 	defer config.SetEnv("JWT_SECRET", originalSecret)
 
-	token, err := CreateToken(tokenType, userId, exp)
+	token, err := CreateToken(tokenType, userId, "user", exp)
 	assert.NoError(t, err)    // 잘못된 비밀키로 토큰 생성이 성공해야 함
 	assert.NotEmpty(t, token) // 토큰이 비어 있지 않아야 함
 
@@ -98,7 +101,7 @@ func TestCreateToken_InvalidSecret(t *testing.T) {
 func TestCreateTokenSet_InvalidUserId(t *testing.T) {
 	invalidUserId := uint(0)
 
-	accessToken, refreshToken, err := CreateTokenSet(invalidUserId)
+	accessToken, refreshToken, err := CreateTokenSet(invalidUserId, "user")
 	assert.NoError(t, err)           // 오류가 없는지 확인
 	assert.NotEmpty(t, accessToken)  // 액세스 토큰이 비어있지 않은지 확인
 	assert.NotEmpty(t, refreshToken) // 리프레시 토큰이 비어있지 않은지 확인
@@ -109,8 +112,9 @@ func TestCreateTokenSet_InvalidUserId(t *testing.T) {
 		return []byte(config.GetEnv("JWT_SECRET")), nil
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, "access", accessClaims["token_type"])         // 토큰 타입이 "access"인지 확인
-	assert.Equal(t, float64(invalidUserId), accessClaims["user"]) // 사용자 ID가 일치하는지 확인
+	assert.Equal(t, "access", accessClaims["token_type"])        // 토큰 타입이 "access"인지 확인
+	assert.Equal(t, "user", accessClaims["sub_type"])            // 사용자 ID가 일치하는지 확인
+	assert.Equal(t, float64(invalidUserId), accessClaims["sub"]) // 사용자 ID가 일치하는지 확인
 
 	// 리프레시 토큰 검증
 	refreshClaims := jwt.MapClaims{}
@@ -118,8 +122,8 @@ func TestCreateTokenSet_InvalidUserId(t *testing.T) {
 		return []byte(config.GetEnv("JWT_SECRET")), nil
 	})
 	assert.NoError(t, err)
-	assert.Equal(t, "refresh", refreshClaims["token_type"])        // 토큰 타입이 "refresh"인지 확인
-	assert.Equal(t, float64(invalidUserId), refreshClaims["user"]) // 사용자 ID가 일치하는지 확인
+	assert.Equal(t, "refresh", refreshClaims["token_type"])       // 토큰 타입이 "refresh"인지 확인
+	assert.Equal(t, float64(invalidUserId), refreshClaims["sub"]) // 사용자 ID가 일치하는지 확인
 }
 
 // TestCreateTokenSet_ExpiredToken 은 토큰의 만료 시간을 짧게 설정하여 만료된 토큰을 검증합니다.
@@ -127,8 +131,8 @@ func TestCreateTokenSet_ExpiredToken(t *testing.T) {
 	userId := uint(1)
 
 	// 매우 짧은 만료 시간으로 토큰 생성
-	accessToken, err := CreateToken("access", userId, 1)
-	refreshToken, err := CreateToken("refresh", userId, 1)
+	accessToken, err := CreateToken("access", userId, "user", 1)
+	refreshToken, err := CreateToken("refresh", userId, "user", 1)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, accessToken)
 
@@ -142,7 +146,7 @@ func TestCreateTokenSet_ExpiredToken(t *testing.T) {
 	assert.Error(t, err) // 만료된 토큰은 오류가 발생해야 함
 
 	// 매우 짧은 만료 시간으로 리프레시 토큰 생성
-	refreshToken, err = CreateToken("refresh", userId, 1)
+	refreshToken, err = CreateToken("refresh", userId, "user", 1)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, refreshToken)
 

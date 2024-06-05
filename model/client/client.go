@@ -2,6 +2,7 @@ package client
 
 import (
 	"errors"
+	"github.com/gofiber/fiber/v3"
 	"go-openapi/config"
 	"go-openapi/model/user"
 	"go-openapi/pkg/auth"
@@ -64,15 +65,12 @@ func CreateClient(userId uint) (*Client, error) {
 // GetClients 클라이언트 조회
 func GetClients(userId uint) (*[]Client, error) {
 	if userId == 0 {
-		return nil, errors.New("invalid user instance")
+		return nil, fiber.NewError(fiber.StatusBadRequest, "invalid user instance")
 	}
 	db := config.GetDB()
 	var clients []Client
 	if err := db.Where("user_id = ?", userId).Find(&clients).Error; err != nil {
-		return nil, err
-	}
-	if len(clients) == 0 {
-		return nil, errors.New("client not found")
+		return nil, fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}
 	return &clients, nil
 }

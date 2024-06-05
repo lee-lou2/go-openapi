@@ -21,7 +21,7 @@ func V1Router(app fiber.Router) {
 			// 비밀번호 재설정 코드 전송
 			user.Post("/password", userHandler.SendPasswordResetCodeHandler)
 			// 비밀번호 재설정
-			user.Patch("/password/:code", userHandler.ResetPasswordHandler)
+			user.Patch("/password", userHandler.ResetPasswordHandler)
 		}
 		auth := v1.Group("/auth")
 		{
@@ -38,6 +38,8 @@ func V1Router(app fiber.Router) {
 
 			// 토큰 발급
 			auth.Post("/token", authHandler.CreateTokenHandler)
+			// 토큰 갱신
+			auth.Post("/token/refresh", authHandler.RefreshTokenHandler)
 		}
 	}
 }

@@ -10,7 +10,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-const dbFileName = "sqlite.db"
+var dbFileName = "sqlite.db"
 
 var (
 	dbInstance *gorm.DB
@@ -20,6 +20,9 @@ var (
 // GetDB 데이터베이스 인스턴스
 func GetDB() *gorm.DB {
 	dbOnce.Do(func() {
+		if IsTesting() {
+			dbFileName = "test.sqlite.db"
+		}
 		db, err := gorm.Open(sqlite.Open(dbFileName), &gorm.Config{
 			Logger: logger.Default.LogMode(logger.Info),
 		})
