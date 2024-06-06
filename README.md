@@ -61,8 +61,8 @@
 │   │   ├── token.go
 │   │   └── token_test.go
 │   └── user
-│   │   ├── password.go
-│   │   ├── user.go
+│       ├── password.go
+│       ├── user.go
 │       └── verify.go
 ├── model
 │   ├── client
