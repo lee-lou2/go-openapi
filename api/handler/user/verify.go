@@ -2,10 +2,8 @@ package user
 
 import (
 	"github.com/gofiber/fiber/v3"
-	authCmd "go-openapi/cmd/user"
-	userCmd "go-openapi/cmd/user"
-	"go-openapi/config"
-	userModel "go-openapi/model/user"
+	"go-openapi/api/validation"
+	userInternal "go-openapi/internal/user"
 )
 
 // SendVerifyCodeHandler 인증 코드 전송 핸들러
@@ -16,21 +14,13 @@ func SendVerifyCodeHandler(c fiber.Ctx) error {
 	if err := c.Bind().JSON(body); err != nil {
 		return err
 	}
-	// 사용자 조회
-	db := config.GetDB()
-	user := userModel.User{}
-	if err := db.Where("email = ?", body.Email).First(&user).Error; err != nil {
-		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
-			"message": "User not found",
-		})
-	}
-	if user.IsVerified {
+	if !validation.ValidateEmail(body.Email) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "User already verified",
+			"message": "Invalid email",
 		})
 	}
-	// 인증 코드 생성
-	if err := authCmd.SendVerifyCode(body.Email, 1); err != nil {
+	err := userInternal.ValidateUserAndSendVerifyCode(body.Email)
+	if err != nil {
 		return err
 	}
 	return c.JSON(fiber.Map{"message": "Code sent"})
@@ -38,40 +28,22 @@ func SendVerifyCodeHandler(c fiber.Ctx) error {
 
 // VerifyCodeHandler 인증 코드 검증 핸들러
 func VerifyCodeHandler(c fiber.Ctx) error {
-	param := struct {
-		Code string `uri:"code"`
-	}{}
-	err := c.Bind().URI(&param)
-	if err != nil || param.Code == "" {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid request",
-		})
-	}
+	code := fiber.Params[string](c, "code")
 	body := new(struct {
 		Email string `json:"email"`
 	})
 	if err := c.Bind().JSON(body); err != nil {
 		return err
 	}
-	// 코드 검증
-	if !userCmd.VerifyCode(body.Email, param.Code, 1) {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"message": "Invalid code",
+	if !validation.ValidateEmail(body.Email) || !validation.ValidateCode(code) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid request",
 		})
+
 	}
-	// 사용자 조회
-	db := config.GetDB()
-	user := userModel.User{}
-	if err := db.Where("email = ?", body.Email).First(&user).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": err.Error(),
-		})
-	}
-	user.IsVerified = true
-	if err := db.Save(&user).Error; err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": err.Error(),
-		})
+	err := userInternal.VerifyCodeAndUpdateUser(body.Email, code)
+	if err != nil {
+		return err
 	}
 	return c.JSON(fiber.Map{"message": "User verified"})
 }

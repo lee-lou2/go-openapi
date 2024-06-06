@@ -28,6 +28,7 @@
 │   ├── handler
 │   │   ├── auth
 │   │   │   ├── client.go
+│   │   │   ├── client_test.go
 │   │   │   ├── login.go
 │   │   │   └── token.go
 │   │   └── user
@@ -39,31 +40,44 @@
 │   │   └── permission.go
 │   ├── router
 │   │   ├── base.go
+│   │   ├── template.go
 │   │   └── v1.go
-│   └── server.go
-├── cmd
-│   ├── auth
-│   │   ├── token.go
-│   │   └── token_test.go
-│   └── user
+│   └── validation
+│       ├── oauth2.go
+│       ├── user.go
 │       └── verify.go
+├── cmd
+│   └── api
+│       └── server.go
 ├── configs
 │   ├── cache.go
 │   ├── db.go
-│   └── env.go
+│   ├── env.go
+│   └── test.go
+├── internal
+│   ├── auth
+│   │   ├── client.go
+│   │   ├── login.go
+│   │   ├── token.go
+│   │   └── token_test.go
+│   └── user
+│   │   ├── password.go
+│   │   ├── user.go
+│       └── verify.go
 ├── model
 │   ├── client
 │   │   └── client.go
 │   └── user
 │       ├── password.go
-│       ├── user.go
-│       └── validation.go
+│       └── user.go
 ├── pkg
 │   ├── auth
 │   │   ├── client.go
 │   │   └── token.go
 │   ├── notify
 │   │   └── email.go
+│   ├── user
+│   │   └── verify.go
 │   └── utils
 │       ├── hash.go
 │       ├── hash_test.go
@@ -71,10 +85,22 @@
 │       ├── password_test.go
 │       ├── string.go
 │       └── string_test.go
+├── views
+│   ├── accounts
+│   │   ├── login.html
+│   │   ├── password.html
+│   │   └── signup.html
+│   ├── user
+│   │   ├── password.html
+│   │   └── verify.html
+│   ├── error.html
+│   └── index.html
 ├── .env
 ├── .gitignore
 ├── go.mod
 ├── go.sum
+├── deploy.sh
+├── Dockerfile
 ├── main.go
 └── README.md
 ```

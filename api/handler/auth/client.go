@@ -2,17 +2,15 @@ package auth
 
 import (
 	"github.com/gofiber/fiber/v3"
-	"go-openapi/model/client"
+	authInternal "go-openapi/internal/auth"
 )
 
 // CreateClientHandler 클라이언트 키 생성 핸들러
 func CreateClientHandler(c fiber.Ctx) error {
 	user := fiber.Locals[uint](c, "user")
-	instance, err := client.CreateClient(user)
+	instance, err := authInternal.CreateClient(user)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": err.Error(),
-		})
+		return err
 	}
 	return c.JSON(fiber.Map{
 		"clientId":     instance.ClientId,
@@ -23,7 +21,7 @@ func CreateClientHandler(c fiber.Ctx) error {
 // GetClientsHandler 클라이언트 키 조회 핸들러
 func GetClientsHandler(c fiber.Ctx) error {
 	user := fiber.Locals[uint](c, "user")
-	clients, err := client.GetClients(user)
+	clients, err := authInternal.GetClients(user)
 	if err != nil {
 		return err
 	}
@@ -43,11 +41,9 @@ func GetClientsHandler(c fiber.Ctx) error {
 func DeleteClientHandler(c fiber.Ctx) error {
 	user := fiber.Locals[uint](c, "user")
 	id := fiber.Params[string](c, "id")
-	err := client.DeleteClient(user, id)
+	err := authInternal.DeleteClient(user, id)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": err.Error(),
-		})
+		return err
 	}
 	return c.Status(fiber.StatusNoContent).SendString("")
 }

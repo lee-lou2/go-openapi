@@ -1,12 +1,12 @@
-package user
+package validation
 
 import (
 	"regexp"
 	"unicode"
 )
 
-// validateEmail 이메일 유효성 검사
-func validateEmail(email string) bool {
+// ValidateEmail 이메일 유효성 검사
+func ValidateEmail(email string) bool {
 	if email == "" {
 		return false
 	}
@@ -15,8 +15,8 @@ func validateEmail(email string) bool {
 	return re.MatchString(email)
 }
 
-// validatePassword 비밀번호 유효성 검사
-func validatePassword(password string) bool {
+// ValidatePassword 비밀번호 유효성 검사
+func ValidatePassword(password string) bool {
 	if len(password) < 6 {
 		return false
 	}

@@ -24,25 +24,8 @@ func init() {
 	_ = db.AutoMigrate(&User{})
 }
 
-// ValidateUser 사용자 정보 유효성 검사
-func ValidateUser(email, password string) (bool, error) {
-	if email == "" || password == "" {
-		return false, fmt.Errorf("invalid email or password")
-	}
-	if !validateEmail(email) {
-		return false, fmt.Errorf("invalid email")
-	}
-	if !validatePassword(password) {
-		return false, fmt.Errorf("invalid password(min: 6, max: 20, at least one letter and one number)")
-	}
-	return true, nil
-}
-
 // CreateUser 사용자 생성
 func CreateUser(tx *gorm.DB, email, password string) (*User, error) {
-	if ok, err := ValidateUser(email, password); !ok || err != nil {
-		return nil, err
-	}
 	hashedPassword, err := utils.HashPassword(password)
 	if err != nil {
 		return nil, err

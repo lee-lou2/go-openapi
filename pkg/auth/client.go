@@ -10,11 +10,9 @@ func GenerateClientKeys() (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-
 	clientSecret, err := utils.GenerateRandomString(64)
 	if err != nil {
 		return "", "", err
 	}
-
 	return clientID, clientSecret, nil
 }

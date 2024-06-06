@@ -2,8 +2,8 @@ package user
 
 import (
 	"github.com/gofiber/fiber/v3"
-	userCmd "go-openapi/cmd/user"
-	userModel "go-openapi/model/user"
+	"go-openapi/api/validation"
+	userInternal "go-openapi/internal/user"
 )
 
 // SendPasswordResetCodeHandler 비밀번호 재설정 코드 전송 핸들러
@@ -14,10 +14,14 @@ func SendPasswordResetCodeHandler(c fiber.Ctx) error {
 	if err := c.Bind().JSON(body); err != nil {
 		return err
 	}
-	if err := userCmd.SendVerifyCode(body.Email, 2); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": err.Error(),
+	if !validation.ValidateEmail(body.Email) {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Invalid email",
 		})
+	}
+	err := userInternal.SendPasswordVerifyCode(body.Email)
+	if err != nil {
+		return err
 	}
 	return c.JSON(fiber.Map{"message": "Code sent"})
 }
@@ -32,20 +36,14 @@ func ResetPasswordHandler(c fiber.Ctx) error {
 	if err := c.Bind().JSON(body); err != nil {
 		return err
 	}
-	if body.Email == "" || body.Password == "" {
+	if !validation.ValidateEmail(body.Email) || !validation.ValidatePassword(body.Password) || !validation.ValidateCode(body.Code) {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid request",
 		})
 	}
-	if !userCmd.VerifyCode(body.Email, body.Code, 2) {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid code",
-		})
-	}
-	if err := userModel.UpdatePassword(body.Email, body.Password); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": err.Error(),
-		})
+	err := userInternal.VerifyCodeAndChangePassword(body.Email, body.Code, body.Password)
+	if err != nil {
+		return err
 	}
 	return c.JSON(fiber.Map{"message": "Password updated"})
 }
