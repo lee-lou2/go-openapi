@@ -5,6 +5,7 @@ import (
 	"go-openapi/config"
 	userModel "go-openapi/model/user"
 	userPkg "go-openapi/pkg/user"
+	"go-openapi/pkg/utils"
 )
 
 // ValidateUserAndSendVerifyCode 사용자 확인 및 인증 코드 전송
@@ -12,7 +13,8 @@ func ValidateUserAndSendVerifyCode(email string) error {
 	// 사용자 조회
 	db := config.GetDB()
 	user := userModel.User{}
-	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+	hashedEmail := utils.SHA256Email(email)
+	if err := db.Where("hashed_email = ?", hashedEmail).First(&user).Error; err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "User not found")
 	}
 	if user.IsVerified {
@@ -34,7 +36,8 @@ func VerifyCodeAndUpdateUser(email, code string) error {
 	// 사용자 조회
 	db := config.GetDB()
 	user := userModel.User{}
-	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+	hashedEmail := utils.SHA256Email(email)
+	if err := db.Where("hashed_email = ?", hashedEmail).First(&user).Error; err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "User not found")
 	}
 	user.IsVerified = true

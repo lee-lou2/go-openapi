@@ -13,7 +13,8 @@ func GetTokenFromLogin(email string, password string) (accessToken string, refre
 	// 사용자 조회
 	db := config.GetDB()
 	user := userModel.User{}
-	if err := db.Where("email = ?", email).Where("is_verified = true").First(&user).Error; err != nil {
+	hashedEmail := utils.SHA256Email(email)
+	if err := db.Where("hashed_email = ?", hashedEmail).Where("is_verified = true").First(&user).Error; err != nil {
 		return "", "", fiber.NewError(fiber.StatusUnauthorized, "invalid user")
 	}
 	// 비밀번호 확인
