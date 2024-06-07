@@ -3,12 +3,13 @@ package utils
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"go-openapi/config"
 	"strings"
 )
 
 // SHA256 SHA-256 해시 생성
 func SHA256(data string) string {
-	dataWithSalt := data + cofig.GetEnv("SHA256_SALT")
+	dataWithSalt := data + config.GetEnv("SHA256_SALT")
 	hash := sha256.New()
 	hash.Write([]byte(dataWithSalt))
 	hashedBytes := hash.Sum(nil)
