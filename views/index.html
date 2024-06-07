@@ -72,18 +72,20 @@
         .create-button:hover {
             border-color: #252525;
         }
-        .logout-button {
+        .logout-link {
             font-size: 12px;
             color: red;
             text-align: center;
             cursor: pointer;
+            display: block;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 <div class="container" id="client-list">
     <button class="create-button" onclick="createClient()">클라이언트 생성</button>
-    <div class="logout-button" onclick="logout()">로그아웃</div>
+    <a class="logout-link" onclick="logout()">로그아웃</a>
 </div>
 <script>
     function fetchClients() {
@@ -108,9 +110,7 @@
             })
             .then(data => {
                 const clientList = document.getElementById('client-list');
-                clientList.innerHTML = `
-                    <button class="create-button" onclick="createClient()">클라이언트 생성</button>
-                    <div class="logout-button" onclick="logout()">로그아웃</div>`;
+                clientList.innerHTML = `<button class="create-button" onclick="createClient()">클라이언트 생성</button>`;
                 if (!data) {
                     return;
                 }
@@ -127,6 +127,7 @@
                         clientList.appendChild(clientDiv);
                     });
                 }
+                clientList.innerHTML += `<a class="logout-link" onclick="logout()">로그아웃</a>`;
             })
             .catch(error => {
                 console.error('Error:', error);
