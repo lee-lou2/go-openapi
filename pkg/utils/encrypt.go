@@ -62,9 +62,12 @@ func (c *AES256) Decrypt(encryptedString string) (decryptedString string) {
 }
 
 // NewAES256 AES256 암호화
-func NewAES256() *AES256 {
+func NewAES256(configs ...string) *AES256 {
+	key := config.GetEnv("AES256_KEY")
+	if configs != nil {
+		key = configs[0]
+	}
 	aesOnce.Do(func() {
-		key := config.GetEnv("AES256_KEY")
 		aesInstance = &AES256{
 			Key: key,
 		}
