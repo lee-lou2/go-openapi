@@ -1,6 +1,14 @@
 package config
 
-import "os"
+import (
+	"github.com/joho/godotenv"
+	"os"
+)
+
+func init() {
+	// 환경 변수 불러오기
+	_ = godotenv.Load()
+}
 
 // GetEnv 환경 변수 조회
 func GetEnv(key string) string {
