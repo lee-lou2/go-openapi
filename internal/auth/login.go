@@ -3,6 +3,7 @@ package auth
 import (
 	"github.com/gofiber/fiber/v3"
 	"go-openapi/config"
+	clientModel "go-openapi/model/client"
 	userModel "go-openapi/model/user"
 	authPkg "go-openapi/pkg/auth"
 	"go-openapi/pkg/utils"
@@ -22,7 +23,7 @@ func GetTokenFromLogin(email string, password string) (accessToken string, refre
 		return "", "", fiber.NewError(fiber.StatusUnauthorized, "invalid user")
 	}
 	// 토큰 생성(사용자 로그인의 경우 클라이언트 관리만 가능)
-	accessToken, refreshToken, err = authPkg.CreateTokenSet(user.ID, "user", "read:client", "write:client")
+	accessToken, refreshToken, err = authPkg.CreateTokenSet(user.ID, "user", clientModel.ScopeWriteClient, clientModel.ScopeReadClient)
 	if err != nil {
 		return "", "", fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}

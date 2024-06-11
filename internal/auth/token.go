@@ -77,7 +77,7 @@ func GetTokenFromRefreshToken(refreshToken string) (string, error) {
 	}
 	// 토큰 생성(15분)
 	exp := 60 * 15
-	token, err := authPkg.CreateToken("access", claims.Sub, "user", exp, "read:client", "write:client")
+	token, err := authPkg.CreateToken("access", claims.Sub, "user", exp, clientModel.ScopeWriteClient, clientModel.ScopeReadClient)
 	if err != nil {
 		return "", fiber.NewError(fiber.StatusInternalServerError, err.Error())
 	}

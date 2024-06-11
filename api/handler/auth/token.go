@@ -1,9 +1,11 @@
 package auth
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v3"
 	"go-openapi/api/validation"
 	authInternal "go-openapi/internal/auth"
+	clientModel "go-openapi/model/client"
 )
 
 // CreateTokenHandler 클라이언트 자격 증명 핸들러
@@ -55,6 +57,6 @@ func RefreshTokenHandler(c fiber.Ctx) error {
 		"tokenType":   "Bearer",
 		"accessToken": token,
 		"expiresIn":   60 * 15,
-		"scope":       "read:client write:client",
+		"scope":       fmt.Sprintf("%s %s", clientModel.ScopeWriteClient, clientModel.ScopeReadClient),
 	})
 }

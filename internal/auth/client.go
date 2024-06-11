@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"fmt"
 	"github.com/gofiber/fiber/v3"
 	"go-openapi/config"
 	clientModel "go-openapi/model/client"
@@ -30,11 +31,12 @@ func CreateClient(userId uint) (*clientModel.Client, error) {
 	if clientCount >= 10 {
 		return nil, fiber.NewError(fiber.StatusBadRequest, "maximum client count exceeded")
 	}
+	scope := fmt.Sprintf("%s %s %s %s", clientModel.ScopeReadClient, clientModel.ScopeWriteClient, clientModel.ScopeReadToken, clientModel.ScopeReadDefault)
 	client := &clientModel.Client{
 		UserID:       userId,
 		ClientId:     clientId,
 		ClientSecret: clientSecret,
-		Scope:        "read:client write:client read:token read:default",
+		Scope:        scope,
 	}
 	if err := db.Create(client).Error; err != nil {
 		return nil, fiber.NewError(fiber.StatusInternalServerError, err.Error())

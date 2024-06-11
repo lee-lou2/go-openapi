@@ -3,8 +3,10 @@ package router
 import (
 	"github.com/gofiber/fiber/v3"
 	authHandler "go-openapi/api/handler/auth"
+	clientHandler "go-openapi/api/handler/client"
 	userHandler "go-openapi/api/handler/user"
 	"go-openapi/api/middleware"
+	clientModel "go-openapi/model/client"
 )
 
 func V1Router(app fiber.Router) {
@@ -26,11 +28,11 @@ func V1Router(app fiber.Router) {
 		auth := v1.Group("/auth")
 		{
 			// Client 생성
-			auth.Post("/client", authHandler.CreateClientHandler, middleware.AuthMiddleware, middleware.PermissionMiddleware("write:client"))
+			auth.Post("/client", authHandler.CreateClientHandler, middleware.AuthMiddleware, middleware.PermissionMiddleware(clientModel.ScopeWriteClient))
 			// Client 조회
-			auth.Get("/client", authHandler.GetClientsHandler, middleware.AuthMiddleware, middleware.PermissionMiddleware("read:client"))
+			auth.Get("/client", authHandler.GetClientsHandler, middleware.AuthMiddleware, middleware.PermissionMiddleware(clientModel.ScopeReadClient))
 			// Client 삭제
-			auth.Delete("/client/:id", authHandler.DeleteClientHandler, middleware.AuthMiddleware, middleware.PermissionMiddleware("write:client"))
+			auth.Delete("/client/:id", authHandler.DeleteClientHandler, middleware.AuthMiddleware, middleware.PermissionMiddleware(clientModel.ScopeWriteClient))
 			// 로그인
 			auth.Post("/login", authHandler.LoginHandler)
 			// 로그아웃
@@ -40,6 +42,11 @@ func V1Router(app fiber.Router) {
 			auth.Post("/token", authHandler.CreateTokenHandler)
 			// 토큰 갱신
 			auth.Post("/token/refresh", authHandler.RefreshTokenHandler)
+		}
+		client := v1.Group("/client")
+		{
+			// 내 정보 조회
+			client.Get("/me", clientHandler.GetMeHandler, middleware.AuthMiddleware, middleware.LimitPerSecondMiddleware(clientModel.ScopeReadMe))
 		}
 	}
 }

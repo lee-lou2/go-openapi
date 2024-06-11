@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"encoding/base64"
 	"fmt"
 	"go-openapi/config"
@@ -11,6 +12,8 @@ import (
 	"time"
 )
 
+var ctx = context.Background()
+
 // SendVerifyCode 인증 코드 전송
 func SendVerifyCode(email string, codeType int) error {
 	code, err := utils.GenerateRandomString(8)
@@ -20,7 +23,10 @@ func SendVerifyCode(email string, codeType int) error {
 	cache := config.GetCache()
 	// RSA 암호화
 	emailHash := utils.SHA256(email)
-	cache.Set(emailHash+":"+strconv.Itoa(codeType), code, time.Duration(5*60))
+	err = cache.Set(ctx, emailHash+":"+strconv.Itoa(codeType), code, time.Duration(5*60)).Err()
+	if err != nil {
+		return err
+	}
 	subject := ""
 	switch codeType {
 	case 1:
@@ -47,11 +53,15 @@ func SendVerifyCode(email string, codeType int) error {
 func VerifyCode(email, code string, codeType int) bool {
 	cache := config.GetCache()
 	emailHash := utils.SHA256(email)
-	cachedCode, ok := cache.Get(emailHash + ":" + strconv.Itoa(codeType))
-	if !ok {
+	key := emailHash + ":" + strconv.Itoa(codeType)
+	cachedCode, err := cache.Get(ctx, key).Result()
+	if err != nil {
 		return false
 	}
 	// 캐시 삭제
-	cache.Delete(emailHash + ":" + strconv.Itoa(codeType))
+	_, err = cache.Del(ctx, key).Result()
+	if err != nil {
+		return false
+	}
 	return cachedCode == code
 }

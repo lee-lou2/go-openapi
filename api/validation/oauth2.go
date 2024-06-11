@@ -1,7 +1,7 @@
 package validation
 
 // ValidateClientCredentials 클라이언트 자격 증명 유효성 검사
-func ValidateClientCredentials(grantType, scope string) bool {
+func ValidateClientCredentials(scope, grantType string) bool {
 	if grantType == "" || scope == "" {
 		return false
 	}

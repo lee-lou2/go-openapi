@@ -13,8 +13,8 @@ func init() {
 
 type Client struct {
 	gorm.Model
-	User         user.User `gorm:"foreignKey:UserID"`
-	UserID       uint      `json:"user_id"`
+	User         user.User `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"`
+	UserID       uint      `json:"user_id" gorm:"index"`
 	ClientId     string    `json:"client_id" gorm:"index"`
 	ClientSecret string    `json:"client_secret" gorm:"index"`
 	Scope        string    `json:"scope"`
