@@ -15,10 +15,6 @@ func V1Router(app fiber.Router) {
 	{
 		user := v1.Group("/user")
 		{
-			// 사용자 생성
-			user.Post("", userHandler.CreateUserHandler)
-			// 인증번호 재전송
-			user.Post("/verify", userHandler.SendVerifyCodeHandler)
 			// 이메일 검증
 			user.Patch("/verify/:code", userHandler.VerifyCodeHandler)
 			// 비밀번호 재설정 코드 전송
@@ -52,20 +48,10 @@ func V1Router(app fiber.Router) {
 	}
 }
 
+// V1Router2 라우터 설정
 func V1Router2() *http.ServeMux {
 	mux := http.NewServeMux()
-	mux.HandleFunc("POST /user", userHandler.CreateUserHandler2)
-	//mux.HandleFunc("/v1/user/verify", userHandler.SendVerifyCodeHandler)
-	//mux.HandleFunc("/v1/user/verify/", userHandler.VerifyCodeHandler)
-	//mux.HandleFunc("/v1/user/password", userHandler.SendPasswordResetCodeHandler)
-	//mux.HandleFunc("/v1/user/password/", userHandler.ResetPasswordHandler)
-	//mux.HandleFunc("/v1/auth/client", authHandler.CreateClientHandler)
-	//mux.HandleFunc("/v1/auth/client/", authHandler.GetClientsHandler)
-	//mux.HandleFunc("/v1/auth/client/", authHandler.DeleteClientHandler)
-	//mux.HandleFunc("/v1/auth/login", authHandler.LoginHandler)
-	//mux.HandleFunc("/v1/auth/logout", authHandler.LogoutHandler)
-	//mux.HandleFunc("/v1/auth/token", authHandler.CreateTokenHandler)
-	//mux.HandleFunc("/v1/auth/token/refresh", authHandler.RefreshTokenHandler)
-	//mux.HandleFunc("/v1/client/me", clientHandler.GetMeHandler)
+	mux.HandleFunc("POST /user", userHandler.CreateUserHandler)
+	mux.HandleFunc("POST /user/verify", userHandler.SendVerifyCodeHandler)
 	return mux
 }
