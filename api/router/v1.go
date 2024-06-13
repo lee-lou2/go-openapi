@@ -7,6 +7,7 @@ import (
 	userHandler "go-openapi/api/handler/user"
 	"go-openapi/api/middleware"
 	clientModel "go-openapi/model/client"
+	"net/http"
 )
 
 func V1Router(app fiber.Router) {
@@ -49,4 +50,22 @@ func V1Router(app fiber.Router) {
 			client.Get("/me", clientHandler.GetMeHandler, middleware.AuthMiddleware, middleware.LimitPerSecondMiddleware(clientModel.ScopeReadMe))
 		}
 	}
+}
+
+func V1Router2() *http.ServeMux {
+	mux := http.NewServeMux()
+	mux.HandleFunc("POST /user", userHandler.CreateUserHandler2)
+	//mux.HandleFunc("/v1/user/verify", userHandler.SendVerifyCodeHandler)
+	//mux.HandleFunc("/v1/user/verify/", userHandler.VerifyCodeHandler)
+	//mux.HandleFunc("/v1/user/password", userHandler.SendPasswordResetCodeHandler)
+	//mux.HandleFunc("/v1/user/password/", userHandler.ResetPasswordHandler)
+	//mux.HandleFunc("/v1/auth/client", authHandler.CreateClientHandler)
+	//mux.HandleFunc("/v1/auth/client/", authHandler.GetClientsHandler)
+	//mux.HandleFunc("/v1/auth/client/", authHandler.DeleteClientHandler)
+	//mux.HandleFunc("/v1/auth/login", authHandler.LoginHandler)
+	//mux.HandleFunc("/v1/auth/logout", authHandler.LogoutHandler)
+	//mux.HandleFunc("/v1/auth/token", authHandler.CreateTokenHandler)
+	//mux.HandleFunc("/v1/auth/token/refresh", authHandler.RefreshTokenHandler)
+	//mux.HandleFunc("/v1/client/me", clientHandler.GetMeHandler)
+	return mux
 }

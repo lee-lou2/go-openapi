@@ -11,8 +11,11 @@ import (
 	"github.com/gofiber/fiber/v3/middleware/recover"
 	"github.com/gofiber/fiber/v3/middleware/requestid"
 	"github.com/gofiber/template/html/v2"
+	"go-openapi/api/middleware"
 	"go-openapi/api/router"
 	"go-openapi/config"
+	"log"
+	"net/http"
 )
 
 func Server() error {
@@ -62,4 +65,22 @@ func Server() error {
 	// 서버 실행
 	ServerPort := config.GetEnv("SERVER_PORT")
 	return app.Listen(":" + ServerPort)
+}
+
+func Server2() error {
+	mux := http.NewServeMux()
+	v1 := router.V1Router2()
+	mux.Handle("/v1/", http.StripPrefix("/v1", v1))
+
+	chain := middleware.Chain(
+		middleware.RecoverMiddleware,
+		middleware.RequestIdMiddleware,
+		middleware.LoggerMiddleware,
+	)
+	server := http.Server{
+		Addr:    ":8089",
+		Handler: chain(mux),
+	}
+	log.Println("Server is running on :8089")
+	return server.ListenAndServe()
 }
