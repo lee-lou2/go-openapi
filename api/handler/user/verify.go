@@ -30,7 +30,7 @@ func SendVerifyCodeHandler(w http.ResponseWriter, r *http.Request) {
 
 // VerifyCodeHandler 인증 코드 검증 핸들러
 func VerifyCodeHandler(w http.ResponseWriter, r *http.Request) {
-	code := request.GetPathParam(r, "code")
+	code := r.PathValue("code")
 	var req struct {
 		Email string `json:"email"`
 	}

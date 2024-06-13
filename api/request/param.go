@@ -11,8 +11,3 @@ func GetQueryParams(r *http.Request) map[string]string {
 	}
 	return result
 }
-
-// GetPathParam 요청의 URL 파라미터 조회
-func GetPathParam(r *http.Request, key string) string {
-	return r.URL.Query().Get(key)
-}

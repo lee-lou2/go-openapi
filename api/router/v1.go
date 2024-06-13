@@ -54,6 +54,6 @@ func V1Router2() *http.ServeMux {
 	// 사용자 확인 및 인증 코드 전송
 	mux.HandleFunc("POST /user/verify", userHandler.SendVerifyCodeHandler)
 	// 인증 코드 확인 및 사용자 업데이트
-	mux.HandleFunc("PATCH /user/verify/:code", userHandler.VerifyCodeHandler)
+	mux.HandleFunc("PATCH /user/verify/{code}", userHandler.VerifyCodeHandler)
 	return mux
 }
