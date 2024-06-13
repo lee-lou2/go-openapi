@@ -15,8 +15,6 @@ func V1Router(app fiber.Router) {
 	{
 		user := v1.Group("/user")
 		{
-			// 이메일 검증
-			user.Patch("/verify/:code", userHandler.VerifyCodeHandler)
 			// 비밀번호 재설정 코드 전송
 			user.Post("/password", userHandler.SendPasswordResetCodeHandler)
 			// 비밀번호 재설정
@@ -51,7 +49,11 @@ func V1Router(app fiber.Router) {
 // V1Router2 라우터 설정
 func V1Router2() *http.ServeMux {
 	mux := http.NewServeMux()
+	// 사용자 생성
 	mux.HandleFunc("POST /user", userHandler.CreateUserHandler)
+	// 사용자 확인 및 인증 코드 전송
 	mux.HandleFunc("POST /user/verify", userHandler.SendVerifyCodeHandler)
+	// 인증 코드 확인 및 사용자 업데이트
+	mux.HandleFunc("PATCH /user/verify/:code", userHandler.VerifyCodeHandler)
 	return mux
 }
