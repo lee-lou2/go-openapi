@@ -23,7 +23,7 @@
         const email = parts[0];
         const code = parts[1];
 
-        fetch(`/v1/user/verify/${code}`, {
+        fetch(`/v1/user/verify/${code}/`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
