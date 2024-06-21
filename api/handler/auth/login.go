@@ -2,41 +2,44 @@ package auth
 
 import (
 	"fmt"
-	"github.com/gofiber/fiber/v3"
+	"go-openapi/api/render"
 	"go-openapi/api/validation"
 	authInternal "go-openapi/internal/auth"
 	"log"
+	"net/http"
 )
 
 // LoginHandler 로그인 핸들러
-func LoginHandler(c fiber.Ctx) error {
-	email := c.FormValue("email")
-	password := c.FormValue("password")
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		render.JSON(w, http.StatusBadRequest, map[string]string{"message": err.Error()})
+		return
+	}
+	email := r.FormValue("email")
+	password := r.FormValue("password")
 	if !validation.ValidateEmail(email) || !validation.ValidatePassword(password) {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid request",
-		})
+		render.JSON(w, http.StatusBadRequest, map[string]string{"message": "Invalid request"})
+		return
 	}
 	accessToken, refreshToken, err := authInternal.GetTokenFromLogin(email, password)
 	if err != nil {
 		// 모든 오류 내용 통일
 		log.Println(err.Error())
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"message": "failed to login",
-		})
+		render.JSON(w, http.StatusInternalServerError, map[string]string{"message": "Internal server error"})
+		return
 	}
-	return c.JSON(fiber.Map{
+	render.JSON(w, http.StatusOK, map[string]string{
 		"tokenType":             "Bearer",
 		"accessToken":           accessToken,
 		"refreshToken":          refreshToken,
-		"accessTokenExpiresIn":  3600,
-		"refreshTokenExpiresIn": 86400,
+		"accessTokenExpiresIn":  "3600",
+		"refreshTokenExpiresIn": "86400",
 	})
 }
 
 // LogoutHandler 로그아웃 핸들러
-func LogoutHandler(c fiber.Ctx) error {
-	user := fiber.Locals[uint](c, "user")
+func LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	user := r.Context().Value("user").(string)
 	fmt.Println(user)
-	return nil
+	render.JSON(w, http.StatusOK, map[string]string{"message": "logout"})
 }

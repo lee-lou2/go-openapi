@@ -1,49 +1,51 @@
 package user
 
 import (
-	"github.com/gofiber/fiber/v3"
+	"go-openapi/api/parser"
+	"go-openapi/api/render"
 	"go-openapi/api/validation"
 	userInternal "go-openapi/internal/user"
+	"net/http"
 )
 
 // SendPasswordResetCodeHandler 비밀번호 재설정 코드 전송 핸들러
-func SendPasswordResetCodeHandler(c fiber.Ctx) error {
-	body := new(struct {
+func SendPasswordResetCodeHandler(w http.ResponseWriter, r *http.Request) {
+	var req struct {
 		Email string `json:"email"`
-	})
-	if err := c.Bind().JSON(body); err != nil {
-		return err
 	}
-	if !validation.ValidateEmail(body.Email) {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid email",
-		})
+	if err := parser.JSON(r, &req); err != nil {
+		render.JSON(w, http.StatusBadRequest, map[string]string{"message": err.Error()})
+		return
 	}
-	err := userInternal.SendPasswordVerifyCode(body.Email)
-	if err != nil {
-		return err
+	if !validation.ValidateEmail(req.Email) {
+		render.JSON(w, http.StatusBadRequest, map[string]string{"message": "Invalid request"})
+		return
 	}
-	return c.JSON(fiber.Map{"message": "Code sent"})
+	if err := userInternal.SendPasswordVerifyCode(req.Email); err != nil {
+		render.JSON(w, http.StatusBadRequest, map[string]string{"message": err.Error()})
+		return
+	}
+	render.JSON(w, http.StatusOK, map[string]string{"message": "Code sent"})
 }
 
 // ResetPasswordHandler 비밀번호 재설정 핸들러
-func ResetPasswordHandler(c fiber.Ctx) error {
-	body := new(struct {
+func ResetPasswordHandler(w http.ResponseWriter, r *http.Request) {
+	var req struct {
 		Code     string `uri:"code"`
 		Email    string `json:"email"`
 		Password string `json:"password"`
-	})
-	if err := c.Bind().JSON(body); err != nil {
-		return err
 	}
-	if !validation.ValidateEmail(body.Email) || !validation.ValidatePassword(body.Password) || !validation.ValidateCode(body.Code) {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid request",
-		})
+	if err := parser.JSON(r, &req); err != nil {
+		render.JSON(w, http.StatusBadRequest, map[string]string{"message": err.Error()})
+		return
 	}
-	err := userInternal.VerifyCodeAndChangePassword(body.Email, body.Code, body.Password)
-	if err != nil {
-		return err
+	if !validation.ValidateEmail(req.Email) || !validation.ValidatePassword(req.Password) || !validation.ValidateCode(req.Code) {
+		render.JSON(w, http.StatusBadRequest, map[string]string{"message": "Invalid request"})
+		return
 	}
-	return c.JSON(fiber.Map{"message": "Password updated"})
+	if err := userInternal.VerifyCodeAndChangePassword(req.Email, req.Code, req.Password); err != nil {
+		render.JSON(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+		return
+	}
+	render.JSON(w, http.StatusOK, map[string]string{"message": "Password updated"})
 }

@@ -1,20 +1,18 @@
 package middleware
 
 import (
-	"github.com/gofiber/fiber/v3"
+	"net/http"
 )
 
-// PermissionMiddleware 권한 미들웨어
-func PermissionMiddleware(scope string) func(c fiber.Ctx) error {
-	return func(c fiber.Ctx) error {
-		scopes := fiber.Locals[[]string](c, "scopes")
+func PermissionMiddleware(scope string, next http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		scopes := r.Context().Value("scopes").([]string)
 		for _, s := range scopes {
 			if s == scope {
-				return c.Next()
+				next.ServeHTTP(w, r)
+				return
 			}
 		}
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-			"error": "Forbidden",
-		})
+		http.Error(w, "Forbidden", http.StatusForbidden)
 	}
 }

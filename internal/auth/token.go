@@ -3,16 +3,18 @@ package auth
 import (
 	"encoding/base64"
 	"fmt"
-	"github.com/gofiber/fiber/v3"
 	"go-openapi/config"
 	clientModel "go-openapi/model/client"
 	authPkg "go-openapi/pkg/auth"
+	"net/http"
 	"strings"
+
+	"github.com/gofiber/fiber/v3"
 )
 
 // getClient 클라이언트 키 가져오기
-func getClient(c fiber.Ctx) (string, string, error) {
-	authHeader := c.Get("Authorization")
+func getClient(r *http.Request) (string, string, error) {
+	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
 		return "", "", fmt.Errorf("authorization header is required")
 	}
@@ -32,9 +34,9 @@ func getClient(c fiber.Ctx) (string, string, error) {
 }
 
 // GetTokenFromClient 클라이언트 자격 증명으로 토큰 발급
-func GetTokenFromClient(c fiber.Ctx, scope string) (string, error) {
+func GetTokenFromClient(r *http.Request, scope string) (string, error) {
 	// 클라이언트 유효성 검사
-	clientId, clientSecret, err := getClient(c)
+	clientId, clientSecret, err := getClient(r)
 	if err != nil {
 		return "", fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}

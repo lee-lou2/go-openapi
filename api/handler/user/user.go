@@ -1,30 +1,29 @@
 package user
 
 import (
-	"github.com/gofiber/fiber/v3"
+	"fmt"
+	"go-openapi/api/render"
 	"go-openapi/api/validation"
 	userInternal "go-openapi/internal/user"
+	"net/http"
 )
 
 // CreateUserHandler 사용자 생성 핸들러
-func CreateUserHandler(c fiber.Ctx) error {
-	body := new(struct {
-		Email    string `form:"email"`
-		Password string `form:"password"`
-	})
-	if err := c.Bind().Body(body); err != nil {
-		return err
+func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
+	if err := r.ParseForm(); err != nil {
+		render.JSON(w, http.StatusBadRequest, map[string]string{"message": err.Error()})
+		return
 	}
-	if !validation.ValidateEmail(body.Email) || !validation.ValidatePassword(body.Password) {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Invalid request",
-		})
+	email := r.FormValue("email")
+	password := r.FormValue("password")
+	if !validation.ValidateEmail(email) || !validation.ValidatePassword(password) {
+		render.JSON(w, http.StatusBadRequest, map[string]string{"message": "Invalid request"})
+		return
 	}
-	err := userInternal.CreateUser(body.Email, body.Password)
-	if err != nil {
-		return err
+	if err := userInternal.CreateUser(email, password); err != nil {
+		fmt.Println(err.Error())
+		render.JSON(w, http.StatusInternalServerError, map[string]string{"message": err.Error()})
+		return
 	}
-	return c.JSON(fiber.Map{
-		"email": body.Email,
-	})
+	render.JSON(w, http.StatusCreated, map[string]string{"email": email})
 }
