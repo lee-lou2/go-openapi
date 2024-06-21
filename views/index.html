@@ -182,7 +182,7 @@
             return;
         }
 
-        fetch(`/v1/auth/client/${clientId}`, {
+        fetch(`/v1/auth/client/${clientId}/`, {
             method: 'DELETE',
             headers: {
                 'Authorization': 'Bearer ' + token
@@ -213,7 +213,7 @@
             return Promise.reject(new Error('No refresh token available'));
         }
 
-        return fetch('/v1/auth/token/refresh', {
+        return fetch('/v1/auth/token/refresh/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -246,7 +246,7 @@
             return;
         }
 
-        fetch('/v1/auth/logout', {
+        fetch('/v1/auth/logout/', {
             method: 'POST',
             headers: {
                 'Authorization': 'Bearer ' + token

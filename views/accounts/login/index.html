@@ -42,7 +42,7 @@
 </head>
 <body>
 <div class="login-container">
-    <form id="login-form" action="/v1/auth/login" method="POST" onsubmit="return validateForm()">
+    <form id="login-form" action="/v1/auth/login/" method="POST" onsubmit="return validateForm()">
         <input type="email" name="email" id="email" class="input-field" placeholder="이메일" required>
         <input type="password" name="password" id="password" class="input-field" placeholder="비밀번호" required>
         <button type="submit" class="login-button">로그인</button>
@@ -90,7 +90,7 @@
             data.append('email', emailField.value);
             data.append('password', passwordField.value);
 
-            fetch('/v1/auth/login', {
+            fetch('/v1/auth/login/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'

@@ -42,7 +42,7 @@
 </head>
 <body>
 <div class="signup-container">
-    <form id="signup-form" action="/v1/user" method="POST" onsubmit="return validateForm()">
+    <form id="signup-form" action="/v1/user/" method="POST" onsubmit="return validateForm()">
         <input type="email" name="email" id="email" class="input-field" placeholder="이메일" required>
         <input type="password" name="password" id="password" class="input-field" placeholder="비밀번호" required>
         <input type="password" name="confirm_password" id="confirm_password" class="input-field" placeholder="비밀번호 확인" required>
@@ -96,7 +96,7 @@
             data.append('email', emailField.value);
             data.append('password', passwordField.value);
 
-            fetch('/v1/user', {
+            fetch('/v1/user/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'

@@ -42,7 +42,7 @@
 </head>
 <body>
 <div class="password-reset-container">
-    <form id="password-reset-form" action="/v1/user/password" method="POST" onsubmit="return validateForm()">
+    <form id="password-reset-form" action="/v1/user/password/" method="POST" onsubmit="return validateForm()">
         <input type="email" name="email" id="email" class="input-field" placeholder="이메일" required>
         <button type="submit" class="send-code-button">코드 발송</button>
     </form>
@@ -79,7 +79,7 @@
                 email: emailField.value
             });
 
-            fetch('/v1/user/password', {
+            fetch('/v1/user/password/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
