@@ -44,7 +44,7 @@ func createAccessToken(t *testing.T, email string) string {
 	instance.IsVerified = true
 	db.Save(&instance)
 	// 로그인
-	r = httptest.NewRequest("POST", "/v1/auth/login", nil)
+	r = httptest.NewRequest("POST", "/v1/auth/login/", nil)
 	w = httptest.NewRecorder()
 	r.Form = map[string][]string{
 		"email":    {email},
@@ -71,7 +71,7 @@ func TestCreateClientHandlerSuccess(t *testing.T) {
 	token := createAccessToken(t, "test-auth-2@test.com")
 
 	// 클라이언트 생성
-	r := httptest.NewRequest("POST", "/v1/auth/client", nil)
+	r := httptest.NewRequest("POST", "/v1/auth/client/", nil)
 	w := httptest.NewRecorder()
 	r.Header.Set("Authorization", "Bearer "+token)
 
@@ -95,7 +95,7 @@ func TestCreateTokenHandlerSuccess(t *testing.T) {
 	token := createAccessToken(t, "test-auth-3@test.com")
 
 	// 클라이언트 생성
-	r := httptest.NewRequest("POST", "/v1/auth/client", nil)
+	r := httptest.NewRequest("POST", "/v1/auth/client/", nil)
 	w := httptest.NewRecorder()
 	r.Header.Set("Authorization", "Bearer "+token)
 
@@ -113,7 +113,7 @@ func TestCreateTokenHandlerSuccess(t *testing.T) {
 	assert.NotEmpty(t, clientId)
 	assert.NotEmpty(t, clientSecret)
 
-	r = httptest.NewRequest("POST", "/v1/auth/token", nil)
+	r = httptest.NewRequest("POST", "/v1/auth/token/", nil)
 	w = httptest.NewRecorder()
 	req := `{"scope": "read:client", "grant_type": "client_credentials"}`
 	r.Header.Set("Content-Type", "application/json")
@@ -136,7 +136,7 @@ func TestGetClientsHandlerSuccess(t *testing.T) {
 	token := createAccessToken(t, "test-auth-4@test.com")
 
 	// 클라이언트 생성
-	r := httptest.NewRequest("POST", "/v1/auth/client", nil)
+	r := httptest.NewRequest("POST", "/v1/auth/client/", nil)
 	w := httptest.NewRecorder()
 	r.Header.Set("Authorization", "Bearer "+token)
 
@@ -154,7 +154,7 @@ func TestGetClientsHandlerSuccess(t *testing.T) {
 	assert.NotEmpty(t, clientId)
 	assert.NotEmpty(t, clientSecret)
 
-	r = httptest.NewRequest("POST", "/v1/auth/token", nil)
+	r = httptest.NewRequest("POST", "/v1/auth/token/", nil)
 	w = httptest.NewRecorder()
 	req := `{"scope": "read:client", "grant_type": "client_credentials"}`
 	r.Header.Set("Content-Type", "application/json")
@@ -172,7 +172,7 @@ func TestGetClientsHandlerSuccess(t *testing.T) {
 	assert.NotEmpty(t, accessToken)
 
 	// 클라이언트 목록 조회
-	r = httptest.NewRequest("GET", "/v1/auth/client", nil)
+	r = httptest.NewRequest("GET", "/v1/auth/client/", nil)
 	w = httptest.NewRecorder()
 	r.Header.Set("Authorization", "Bearer "+accessToken)
 
@@ -204,7 +204,7 @@ func TestDeleteClientsHandlerSuccess(t *testing.T) {
 	token := createAccessToken(t, "test-auth-5@test.com")
 
 	// 클라이언트 생성
-	r := httptest.NewRequest("POST", "/v1/auth/client", nil)
+	r := httptest.NewRequest("POST", "/v1/auth/client/", nil)
 	w := httptest.NewRecorder()
 	r.Header.Set("Authorization", "Bearer "+token)
 
@@ -222,7 +222,7 @@ func TestDeleteClientsHandlerSuccess(t *testing.T) {
 	assert.NotEmpty(t, clientId)
 	assert.NotEmpty(t, clientSecret)
 
-	r = httptest.NewRequest("POST", "/v1/auth/token", nil)
+	r = httptest.NewRequest("POST", "/v1/auth/token/", nil)
 	w = httptest.NewRecorder()
 	req := `{"scope": "read:client", "grant_type": "client_credentials"}`
 	r.Header.Set("Content-Type", "application/json")
@@ -240,7 +240,7 @@ func TestDeleteClientsHandlerSuccess(t *testing.T) {
 	assert.NotEmpty(t, accessToken)
 
 	// 클라이언트 목록 조회
-	r = httptest.NewRequest("GET", "/v1/auth/client", nil)
+	r = httptest.NewRequest("GET", "/v1/auth/client/", nil)
 	w = httptest.NewRecorder()
 	r.Header.Set("Authorization", "Bearer "+accessToken)
 
@@ -271,7 +271,7 @@ func TestDeleteClientsHandlerSuccess(t *testing.T) {
 	}
 
 	// 클라이언트 삭제
-	r = httptest.NewRequest("DELETE", "/v1/auth/client/"+strconv.Itoa(lastId), nil)
+	r = httptest.NewRequest("DELETE", "/v1/auth/client/"+strconv.Itoa(lastId)+"/", nil)
 	w = httptest.NewRecorder()
 	r.Header.Set("Authorization", "Bearer "+accessToken)
 
@@ -282,7 +282,7 @@ func TestDeleteClientsHandlerSuccess(t *testing.T) {
 
 // TestCreateTokenHandlerFail1 토큰 생성 실패(경로 오류)
 func TestCreateTokenHandlerFail1(t *testing.T) {
-	r := httptest.NewRequest("POST", "/v1/auth/tokens", nil)
+	r := httptest.NewRequest("POST", "/v1/auth/tokens/", nil)
 	w := httptest.NewRecorder()
 
 	server := api.Server()
@@ -293,7 +293,7 @@ func TestCreateTokenHandlerFail1(t *testing.T) {
 
 // TestCreateTokenHandlerFail2 토큰 생성 실패(요청 JSON 오류)
 func TestCreateTokenHandlerFail2(t *testing.T) {
-	r := httptest.NewRequest("POST", "/v1/auth/token", nil)
+	r := httptest.NewRequest("POST", "/v1/auth/token/", nil)
 	w := httptest.NewRecorder()
 	req := `{"scopes": "read"}`
 	r.Header.Set("Content-Type", "application/json")
@@ -310,7 +310,7 @@ func TestCreateTokenHandlerFail2(t *testing.T) {
 
 // TestCreateTokenHandlerFail3 토큰 생성 실패(요청 JSON 오류)
 func TestCreateTokenHandlerFail3(t *testing.T) {
-	r := httptest.NewRequest("POST", "/v1/auth/token", nil)
+	r := httptest.NewRequest("POST", "/v1/auth/token/", nil)
 	w := httptest.NewRecorder()
 	req := `{"scope": "read", "grant_type": "password"}`
 	r.Header.Set("Content-Type", "application/json")

@@ -47,7 +47,7 @@ func TestCreateUserSuccess(t *testing.T) {
 // TestCreateUserFail1 사용자 생성 실패(경로 오류)
 func TestCreateUserFail(t *testing.T) {
 	w := httptest.NewRecorder()
-	r := httptest.NewRequest("POST", "/v1/users", nil)
+	r := httptest.NewRequest("POST", "/v1/users/", nil)
 
 	server := api.Server()
 	server.ServeHTTP(w, r)
@@ -157,7 +157,7 @@ func TestSendVerifyCodeHandlerSuccess(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	user := `{"email": "test@test.com"}`
-	r := httptest.NewRequest("POST", "/v1/user/verify", nil)
+	r := httptest.NewRequest("POST", "/v1/user/verify/", nil)
 	r.Header.Set("Content-Type", "application/json")
 	r.Body = ioutil.NopCloser(strings.NewReader(user))
 
@@ -174,7 +174,7 @@ func TestSendVerifyCodeHandlerSuccess(t *testing.T) {
 func TestSendVerifyCodeHandlerFail1(t *testing.T) {
 	w := httptest.NewRecorder()
 	user := `{"email": "test2@test.com"}`
-	r := httptest.NewRequest("POST", "/v1/user/verify", nil)
+	r := httptest.NewRequest("POST", "/v1/user/verify/", nil)
 	r.Header.Set("Content-Type", "application/json")
 	r.Body = ioutil.NopCloser(strings.NewReader(user))
 
@@ -203,7 +203,7 @@ func TestSendVerifyCodeHandlerFail2(t *testing.T) {
 	db.Save(&instance)
 	w := httptest.NewRecorder()
 	user := `{"email": "test@test.com"}`
-	r := httptest.NewRequest("POST", "/v1/user/verify", nil)
+	r := httptest.NewRequest("POST", "/v1/user/verify/", nil)
 	r.Header.Set("Content-Type", "application/json")
 	r.Body = ioutil.NopCloser(strings.NewReader(user))
 
@@ -242,7 +242,7 @@ func TestSendPasswordResetCodeHandlerSuccess(t *testing.T) {
 
 	w := httptest.NewRecorder()
 	user := `{"email": "test@test.com"}`
-	r := httptest.NewRequest("POST", "/v1/user/password", nil)
+	r := httptest.NewRequest("POST", "/v1/user/password/", nil)
 	r.Header.Set("Content-Type", "application/json")
 	r.Body = ioutil.NopCloser(strings.NewReader(user))
 
@@ -258,7 +258,7 @@ func TestSendPasswordResetCodeHandlerSuccess(t *testing.T) {
 func TestSendPasswordResetCodeHandlerFail1(t *testing.T) {
 	w := httptest.NewRecorder()
 	user := `{"email": "test2@test.com"}`
-	r := httptest.NewRequest("POST", "/v1/user/password", nil)
+	r := httptest.NewRequest("POST", "/v1/user/password/", nil)
 	r.Header.Set("Content-Type", "application/json")
 	r.Body = ioutil.NopCloser(strings.NewReader(user))
 
@@ -286,7 +286,7 @@ func TestSendPasswordResetCodeHandlerFail2(t *testing.T) {
 	db.Save(&instance)
 	w := httptest.NewRecorder()
 	user := `{"email": "test@test.com"}`
-	r := httptest.NewRequest("POST", "/v1/user/password", nil)
+	r := httptest.NewRequest("POST", "/v1/user/password/", nil)
 	r.Header.Set("Content-Type", "application/json")
 	r.Body = ioutil.NopCloser(strings.NewReader(user))
 
