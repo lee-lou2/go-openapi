@@ -16,6 +16,9 @@ var ctx = context.Background()
 
 // SendVerifyCode 인증 코드 전송
 func SendVerifyCode(email string, codeType int) error {
+	if config.IsTesting() {
+		return nil
+	}
 	code, err := utils.GenerateRandomString(8)
 	if err != nil {
 		return err

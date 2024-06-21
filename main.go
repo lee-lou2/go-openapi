@@ -1,14 +1,18 @@
 package main
 
 import (
-	"github.com/joho/godotenv"
 	"go-openapi/cmd/api"
+	"go-openapi/config"
 	"log"
+	"net/http"
 )
 
 func main() {
-	// 환경 변수 불러오기
-	_ = godotenv.Load()
 	// API 서버 실행
-	log.Fatal(api.Server2())
+	server := api.Server()
+	serverPort := config.GetEnv("SERVER_PORT")
+	if serverPort == "" {
+		serverPort = "3000"
+	}
+	log.Fatal(http.ListenAndServe(":"+serverPort, server))
 }

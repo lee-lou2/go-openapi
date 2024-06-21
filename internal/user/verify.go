@@ -1,11 +1,12 @@
 package user
 
 import (
-	"github.com/gofiber/fiber/v3"
 	"go-openapi/config"
 	userModel "go-openapi/model/user"
 	userPkg "go-openapi/pkg/user"
 	"go-openapi/pkg/utils"
+
+	"github.com/gofiber/fiber/v3"
 )
 
 // ValidateUserAndSendVerifyCode 사용자 확인 및 인증 코드 전송
@@ -20,7 +21,7 @@ func ValidateUserAndSendVerifyCode(email string) error {
 	if user.IsVerified {
 		return fiber.NewError(fiber.StatusBadRequest, "User already verified")
 	}
-	// 인증 코드 생성
+	// 인증 코드 생성 및 전송
 	if err := userPkg.SendVerifyCode(email, 1); err != nil {
 		return err
 	}

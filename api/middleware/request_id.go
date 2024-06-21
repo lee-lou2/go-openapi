@@ -1,8 +1,9 @@
 package middleware
 
 import (
-	"github.com/google/uuid"
 	"net/http"
+
+	"github.com/google/uuid"
 )
 
 // RequestIdMiddleware Request ID 미들웨어

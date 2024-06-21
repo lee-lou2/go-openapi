@@ -21,7 +21,7 @@ var (
 )
 
 // Encrypt AES 암호화
-func (c *AES256) Encrypt(stringToEncrypt string) (encryptedString string) {
+func (c *AES256) Encrypt(stringToEncrypt string) string {
 	key, _ := hex.DecodeString(c.Key)
 	plaintext := []byte(stringToEncrypt)
 	block, err := aes.NewCipher(key)
@@ -41,7 +41,7 @@ func (c *AES256) Encrypt(stringToEncrypt string) (encryptedString string) {
 }
 
 // Decrypt AES 복호화
-func (c *AES256) Decrypt(encryptedString string) (decryptedString string) {
+func (c *AES256) Decrypt(encryptedString string) string {
 	key, _ := hex.DecodeString(c.Key)
 	enc, _ := hex.DecodeString(encryptedString)
 	block, err := aes.NewCipher(key)
@@ -58,7 +58,7 @@ func (c *AES256) Decrypt(encryptedString string) (decryptedString string) {
 	if err != nil {
 		panic(err.Error())
 	}
-	return fmt.Sprintf("%s", plaintext)
+	return string(plaintext)
 }
 
 // NewAES256 AES256 암호화

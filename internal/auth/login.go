@@ -1,12 +1,13 @@
 package auth
 
 import (
-	"github.com/gofiber/fiber/v3"
 	"go-openapi/config"
 	clientModel "go-openapi/model/client"
 	userModel "go-openapi/model/user"
 	authPkg "go-openapi/pkg/auth"
 	"go-openapi/pkg/utils"
+
+	"github.com/gofiber/fiber/v3"
 )
 
 // GetTokenFromLogin 로그인으로 토큰 발급
