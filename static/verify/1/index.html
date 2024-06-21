@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirect</title>
+    <script type="text/javascript">
+        function redirectToVerify() {
+            var queryString = window.location.search;
+            window.location.href = "/user/verify/" + queryString;
+        }
+        window.onload = redirectToVerify;
+    </script>
+</head>
+<body>
+</body>
+</html>

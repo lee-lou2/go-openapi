@@ -8,19 +8,6 @@ import (
 	"strconv"
 )
 
-// // CreateClientHandler 클라이언트 키 생성 핸들러
-// func CreateClientHandler(c fiber.Ctx) error {
-// 	user := fiber.Locals[uint](c, "user")
-// 	instance, err := authInternal.CreateClient(user)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return c.JSON(fiber.Map{
-// 		"clientId":     instance.ClientId,
-// 		"clientSecret": instance.ClientSecret,
-// 	})
-// }
-
 // CreateClientHandler 클라이언트 키 생성 핸들러
 func CreateClientHandler(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value("user").(uint)

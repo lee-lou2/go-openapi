@@ -10,6 +10,7 @@
     // URL 쿼리 파라미터에서 'code' 값을 가져옵니다.
     const urlParams = new URLSearchParams(window.location.search);
     const encodedCode = urlParams.get('code');
+    console.log(encodedCode);
 
     if (!encodedCode) {
         window.location.href = '/error?m=' + encodeURIComponent('No code provided in query string');

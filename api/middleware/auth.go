@@ -26,7 +26,7 @@ func AuthMiddleware(next http.Handler) http.HandlerFunc {
 		}
 		// 사용자 정보를 context에 저장
 		ctx := r.Context()
-		ctx = context.WithValue(ctx, "user", claims.Sub)
+		ctx = context.WithValue(ctx, claims.SubType, claims.Sub)
 		scopes := strings.Split(claims.Scope, " ")
 		ctx = context.WithValue(ctx, "scopes", scopes)
 		r = r.WithContext(ctx)

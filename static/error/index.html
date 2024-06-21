@@ -24,7 +24,17 @@
 </head>
 <body>
 <div class="container">
-    <div class="message" id="message">{{.message}}</div>
+    <div class="message" id="message"></div>
 </div>
+<script>
+    const Message = document.getElementById('message');
+    const urlParams = new URLSearchParams(window.location.search);
+    const message = urlParams.get('m');
+    if (message) {
+        Message.innerText = message;
+    } else {
+        Message.innerText = 'An error occurred';
+    }
+</script>
 </body>
 </html>
