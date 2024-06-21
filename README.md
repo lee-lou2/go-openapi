@@ -3,6 +3,11 @@
 ## 프로젝트 소개
 Golang 자체 net/http 를 이용하여 Open API 를 개발하는 개인 프로젝트
 
+## 도전 및 자체 과제
+- 프레임워크를 사용하지 않고 net/http 를 이용해 REST API 구현
+- 미들웨어 및 인증, 권한 등을 자체 구현
+- 각 기능별 테스트 진행(테스트 코드 추가 작성 필요)
+
 ## 서비스 및 구성
 - **사용자**: 사용자 생성 및 관련 기능
 - **인증**: OAuth2.0 기반으로 개발자 등록(Bearer JWT), API(Client Credentials) 구현
@@ -12,7 +17,7 @@ Golang 자체 net/http 를 이용하여 Open API 를 개발하는 개인 프로�
 - **미들웨어**: static, cors, recover, request_id 등
 - **기타**: AWS 파라미터 스토어를 이용한 환경 변수 관리
 
-## 사용 기술 스택
+## 기술 스택
 - **언어**: Golang
 - **인증**: Bearer(JWT), OAuth2.0(Client Credentials)
 - **데이터베이스**: Sqlite3(Local), Postgresql(DEV, QA, Prod)
